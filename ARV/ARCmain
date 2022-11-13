@@ -30,8 +30,6 @@ int main(void) {
 	HAL_Init();
 	SystemClock_Config();
 
-
-
 	//define pins to use
 	MX_GPIO_Init();
 
@@ -41,8 +39,6 @@ int main(void) {
 	MX_TIM11_Init();
 
 	MX_USART2_UART_Init();
-
-
 
 	// Init camera
 	camera_GPIO_init();
