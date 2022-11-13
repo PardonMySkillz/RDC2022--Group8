@@ -46,6 +46,12 @@ int main(void) {
 
 	// Init camera
 	camera_GPIO_init();
+	//cam_set_colormode(CamColorMode c);
+	//cam_set_frameSize(CamFrameSize f);
+	//cam_set_brightness(int8_t brightness);
+	//cam_set_contrast(int8_t contrast);
+	//cam_set_framerate(CamFrameRate rate);
+	
 	tft_prints(0, 0, "Initing camera");
 	tft_update(0);
 	if (camera_init() == CAM_NOT_INITED || camera_init() == CAM_INIT_ERROR) {
@@ -58,9 +64,4 @@ int main(void) {
 	cam_set_window(0, 0, QQVGA_120x160);
 	cam_set_framerate(CAM_75FPS);
 	
-
-
-
-
-
 }
