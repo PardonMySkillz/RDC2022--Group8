@@ -60,4 +60,20 @@ int main(void) {
 	cam_set_window(0, 0, QQVGA_120x160);
 	cam_set_framerate(CAM_75FPS);
 	
+	
+	can_init();
+	while (1) {
+		if (tft_update(10) == 0) {
+				tft_prints(0,0,"m1_spd: %d", motor1_stat.speed_rpm);
+				tft_prints(0,1,"m1_temp: %d", motor1_stat.temperature);
+				tft_prints(0,2,"m1_cur: %d", motor1_stat.given_current);
+			}
+		/* USER CODE END WHILE */
+		HAL_CAN_RxFifo0MsgPendingCallback(&hcan1);
+		UpdateMotorStatus();
+		/* USER CODE BEGIN 3 */
+		// goto tutorial2_hw.c to do your classwork and homework
+			CAN_cmd_motor(1000, 1000, 1000, 1000,&hcan1); 
+		// led blinky - useful for indicating the condition of the board
+    	}
 }
