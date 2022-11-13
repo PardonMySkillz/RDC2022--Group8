@@ -63,11 +63,6 @@ int main(void) {
 	
 	can_init();
 	while (1) {
-		if (tft_update(10) == 0) {
-				tft_prints(0,0,"m1_spd: %d", motor1_stat.speed_rpm);
-				tft_prints(0,1,"m1_temp: %d", motor1_stat.temperature);
-				tft_prints(0,2,"m1_cur: %d", motor1_stat.given_current);
-			}
 		/* USER CODE END WHILE */
 		HAL_CAN_RxFifo0MsgPendingCallback(&hcan1);
 		UpdateMotorStatus();
