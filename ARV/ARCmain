@@ -63,12 +63,8 @@ int main(void) {
 	
 	can_init();
 	while (1) {
-		/* USER CODE END WHILE */
 		HAL_CAN_RxFifo0MsgPendingCallback(&hcan1);
 		UpdateMotorStatus();
-		/* USER CODE BEGIN 3 */
-		// goto tutorial2_hw.c to do your classwork and homework
-			CAN_cmd_motor(1000, 1000, 1000, 1000,&hcan1); 
-		// led blinky - useful for indicating the condition of the board
+		CAN_cmd_motor(1000, 1000, 1000, 1000,&hcan1); 
     	}
 }
