@@ -1,0 +1,66 @@
+/*
+ * ARC.c
+ *
+ *  Created on: Nov 13, 2022
+ *      Author: hcwon
+ */
+
+#include "main.h"
+
+#include "can.h"
+#include "dma.h"
+#include "gpio.h"
+#include "i2c.h"
+#include "spi.h"
+#include "tim.h"
+#include "usart.h"
+
+#include "camera/camera.h"
+#include "lcd/lcd.h"
+#include "lcd/lcd_graphics.h"
+
+
+#define FORWARD 0
+#define BACKWARD 1
+
+#define LEFT 0
+#define RIGHT 1
+
+int main(void) {
+	HAL_Init();
+	SystemClock_Config();
+
+
+
+	//define pins to use
+	MX_GPIO_Init();
+
+	MX_TIM5_Init(); 
+
+	MX_TIM10_Init();
+	MX_TIM11_Init();
+
+	MX_USART2_UART_Init();
+
+
+
+	// Init camera
+	camera_GPIO_init();
+	tft_prints(0, 0, "Initing camera");
+	tft_update(0);
+	if (camera_init() == CAM_NOT_INITED || camera_init() == CAM_INIT_ERROR) {
+		tft_prints(0, 0, "No OV7725 module");
+	} else {
+		tft_prints(0, 0, "Inited");
+		cam_set_state(CAM_CAPTURING);
+	}
+	tft_update(0);
+	cam_set_window(0, 0, QQVGA_120x160);
+	cam_set_framerate(CAM_75FPS);
+	
+
+
+
+
+
+}
