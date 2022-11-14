@@ -26,6 +26,17 @@
 #define LEFT 0
 #define RIGHT 1
 
+//motor direction
+#define IN1  GPIO_PIN_8
+#define IN2  GPIO_PIN_9
+#define IN3  GPIO_PIN_10
+#define IN4  GPIO_PIN_11
+
+//gpio with timer (PWM)
+#define servo TIM5->CH1
+#define left_motor TIM11->CH1
+#define right_motor TIM10-_CH1
+
 int main(void) {
 	HAL_Init();
 	SystemClock_Config();
