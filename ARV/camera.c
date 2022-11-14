@@ -584,4 +584,7 @@ void sobelOperation(uint16_t width, uint16_t height, uint8_t* originalPTR, uint8
     }
 }
 
+void sharpen(uint16_t width, uint16_t height, uint16_t* image, uint16_t* sharpened_image) {
+	
+
 
