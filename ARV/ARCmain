@@ -71,4 +71,27 @@ int main(void) {
 	cam_set_window(0, 0, QQVGA_120x160);
 	cam_set_framerate(CAM_75FPS);
 	
+	while(1){
+	    for (uint16_t j = 1; i < IMG_HEIGHT-1; i += IMG_WIDTH) {
+		if (image[(IMG_WIDTH/2)+j] = image[1+j]){ // turn right
+		    gpio_set(IN1);
+				gpio_reset(IN2);
+				gpio_reset(IN3);
+				gpio_set(IN4);
+		}
+		else if (image[(IMG_WIDTH/2)+j] == image[(IMG_WIDTH-1)+j]){ // turn left
+		    gpio_reset(IN1);
+				gpio_set(IN2);
+				gpio_set(IN3);
+				gpio_reset(IN4);
+		}
+		else{ 
+		    gpio_reset(IN1);
+				gpio_set(IN2);
+				gpio_reset(IN3);
+				gpio_set(IN4);
+		}
+	    }    
+	}
+	
 }
