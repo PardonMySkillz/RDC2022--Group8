@@ -519,17 +519,17 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	}
 }
 
-void image_processing_to_gray_scale(uint16_t* image) {
+void image_processing_to_gray_scale(uint16_t width, uint16_t height, uintt8_t* originaldataPtr, uint8_t* processed_dataPtr) {
 	int height = IMG_HEIGHT;
 	int width = IMG_WIDTH;
 	for (int i=0; i < height; i++) {
 		for (int j=0; j < width; j++) {
-			int16_t pixel = cam_get_rgb565(*(image+width*i+j));
+			int16_t pixel = cam_get_rgb565(*(originaldataPtr+width*i+j));
 			int16_t red = ((pixel & 0xF800) >> 11);
 			int16_t green = ((pixel & 0x07E0) >> 5);
 			int16_t blue = (pixel & 0x001F);
 			int16_t gray_pixel = (red+green+blue)/3;
-			*(image+width*i+j) = gray_pixel;
+			*(processed_dataPtr+width*i+j) = gray_pixel;
 		}
 	}
 }
@@ -584,7 +584,13 @@ void sobelOperation(uint16_t width, uint16_t height, uint8_t* originalPTR, uint8
     }
 }
 
-void sharpen(uint16_t width, uint16_t height, uint16_t* image, uint16_t* sharpened_image) {
+void overallImgProcessor(uint16_t width, uint16_t height, uint8_t* originaldataPtr, uint8_t* processed_dataPtr) {
+	image_processing_to_gray_scale(width, height, originaldataPtr, processed_dataPtr);
+	medianFilter(width, height, originaldataPtr, processed_dataPtr);
+	sobelOperation( width, height, originalPTR, processed_dataPtr);
+}
+	
+	
 	
 
 
