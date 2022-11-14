@@ -35,7 +35,7 @@
 //gpio with timer (PWM)
 #define servo TIM5->CH1
 #define left_motor TIM11->CH1
-#define right_motor TIM10-_CH1
+#define right_motor TIM10->CH1
 
 int main(void) {
 	HAL_Init();
@@ -70,6 +70,11 @@ int main(void) {
 	tft_update(0);
 	cam_set_window(0, 0, QQVGA_120x160);
 	cam_set_framerate(CAM_75FPS);
+	
+	
+	TIM5->ARR = 839;
+	TIM10->ARR = 839;
+	TIM11->ARR = 839;
 	
 	while(1){
 	    for (uint16_t j = 1; i < IMG_HEIGHT-1; i += IMG_WIDTH) {
