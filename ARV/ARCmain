@@ -71,11 +71,4 @@ int main(void) {
 	cam_set_window(0, 0, QQVGA_120x160);
 	cam_set_framerate(CAM_75FPS);
 	
-	
-	can_init();
-	while (1) {
-		HAL_CAN_RxFifo0MsgPendingCallback(&hcan1);
-		UpdateMotorStatus();
-		CAN_cmd_motor(1000, 1000, 1000, 1000,&hcan1); 
-    	}
 }
