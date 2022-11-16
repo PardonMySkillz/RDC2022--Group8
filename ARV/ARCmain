@@ -27,25 +27,23 @@
 #define RIGHT 1
 
 //motor direction
-#define IN1  GPIO_PIN_8
-#define IN2  GPIO_PIN_9
-#define IN3  GPIO_PIN_10
-#define IN4  GPIO_PIN_11
+
 
 //gpio with timer (PWM)
-#define servo TIM5->CH1
-#define left_motor TIM11->CH1
-#define right_motor TIM10->CH1
+
+
+
+
 
 int main(void) {
 	HAL_Init();
+
 	SystemClock_Config();
 
 	//define pins to use
 	MX_GPIO_Init();
 
-	MX_TIM5_Init(); 
-
+	MX_TIM5_Init();
 	MX_TIM10_Init();
 	MX_TIM11_Init();
 
@@ -58,7 +56,7 @@ int main(void) {
 	//cam_set_brightness(int8_t brightness);
 	//cam_set_contrast(int8_t contrast);
 	//cam_set_framerate(CamFrameRate rate);
-	
+
 	tft_prints(0, 0, "Initing camera");
 	tft_update(0);
 	if (camera_init() == CAM_NOT_INITED || camera_init() == CAM_INIT_ERROR) {
@@ -69,15 +67,48 @@ int main(void) {
 	}
 	tft_update(0);
 	cam_set_window(0, 0, QQVGA_120x160);
+	cam_set_framesize(QQVGA_120x160);
 	cam_set_framerate(CAM_75FPS);
-	
-	
-	TIM5->ARR = 839;
-	TIM10->ARR = 839;
-	TIM11->ARR = 839;
-	
+	cam_set_brightness(0);
+	cam_set_saturation(0);
+	cam_set_contrast(0);
+
+
+	TIM10 ->ARR = 839;
+	TIM11 ->ARR = 839;
+	TIM5 ->ARR = 839;
+
+	TIM10 ->PSC = 9;
+	TIM11 ->PSC = 9;
+	TIM5 ->PSC = 9;
+
+	const uint16_t IMG_WIDTH = 120;
+	const uint16_t IMG_HEIGHT = 160;
+
+
+
 	while(1){
-	    for (uint16_t j = 1; i < IMG_HEIGHT-1; i += IMG_WIDTH) {
+
+		//do image processing
+		uint16_t image[IMG_HEIGHT][IMG_WIDTH];
+		uint16_t* image_ptr = image;
+
+		uint16_t img_data[IMG_HEIGHT][IMG_WIDTH];
+		uint16_t* img_data_ptr = img_data;
+
+		uint16_t processed_image[IMG_HEIGHT][IMG_WIDTH];
+		uint16_t* processed_image_ptr = processed_image;
+
+		cam_get_rgb565(image_ptr);
+		cam_rgb2printable(image_ptr, img_data_ptr);
+
+		overallImgProcessor(IMG_WIDTH, IMG_HEIGHT, img_data_ptr, processed_image_ptr);
+
+		tft_print_image(processed_image_ptr, 0, 0, 120, 160);
+
+
+
+	    for (uint16_t j = 1; j < IMG_HEIGHT-1; j += IMG_WIDTH) {
 		if (image[(IMG_WIDTH/2)+j] = image[1+j]){ // turn right
 		    gpio_set(IN1);
 				gpio_reset(IN2);
@@ -90,13 +121,73 @@ int main(void) {
 				gpio_set(IN3);
 				gpio_reset(IN4);
 		}
-		else{ 
+		else{
 		    gpio_reset(IN1);
 				gpio_set(IN2);
 				gpio_reset(IN3);
 				gpio_set(IN4);
 		}
-	    }    
+	    }
 	}
-	
+
+
+	uint16_t image[QQVGA_120x160];
+	uint16_t* image_ptr = image;
+}
+
+
+
+
+
+
+
+void SystemClock_Config(void)
+{
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+
+  /** Configure the main internal regulator output voltage
+  */
+  __HAL_RCC_PWR_CLK_ENABLE();
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
+
+  /** Initializes the RCC Oscillators according to the specified parameters
+  * in the RCC_OscInitTypeDef structure.
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLM = 4;
+  RCC_OscInitStruct.PLL.PLLN = 168;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+  RCC_OscInitStruct.PLL.PLLQ = 4;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Initializes the CPU, AHB and APB buses clocks
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
+
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+
+void Error_Handler(void)
+{
+  /* USER CODE BEGIN Error_Handler_Debug */
+	/* User can add his own implementation to report the HAL error return state */
+	__disable_irq();
+	while (1) {}
+  /* USER CODE END Error_Handler_Debug */
 }
