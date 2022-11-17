@@ -72,40 +72,40 @@ void SystemClock_Config(void);
   */
 int main(void)
 {
-  /* USER CODE BEGIN 1 */
+	/* USER CODE BEGIN 1 */
 
-  /* USER CODE END 1 */
+	/* USER CODE END 1 */
 
-  /* MCU Configuration--------------------------------------------------------*/
+	/* MCU Configuration--------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+	HAL_Init();
 
-  /* USER CODE BEGIN Init */
+	/* USER CODE BEGIN Init */
 
-  /* USER CODE END Init */
+	/* USER CODE END Init */
 
-  /* Configure the system clock */
-  SystemClock_Config();
+	/* Configure the system clock */
+	SystemClock_Config();
 
-  /* USER CODE BEGIN SysInit */
+	/* USER CODE BEGIN SysInit */
 
-  /* USER CODE END SysInit */
+	/* USER CODE END SysInit */
 
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_CAN1_Init();
-  MX_CAN2_Init();
-//  MX_SPI1_Init();
-  MX_USART1_UART_Init();
-//  MX_I2C2_Init();
-  MX_DMA_Init();
-  MX_USART2_UART_Init();
-  MX_TIM5_Init();
-  MX_TIM6_Init();
-  MX_TIM10_Init();
-  MX_TIM11_Init();
-  /* USER CODE BEGIN 2 */
+	/* Initialize all configured peripherals */
+	MX_GPIO_Init();
+	MX_CAN1_Init();
+	MX_CAN2_Init();
+	//  MX_SPI1_Init();
+	MX_USART1_UART_Init();
+	//  MX_I2C2_Init();
+	MX_DMA_Init();
+	MX_USART2_UART_Init();
+	MX_TIM5_Init();
+	MX_TIM6_Init();
+	MX_TIM10_Init();
+	MX_TIM11_Init();
+	/* USER CODE BEGIN 2 */
 	volatile uint32_t last_ticks = 0;
 	// we turn off all the led first
 	led_off(LED1);
@@ -117,72 +117,64 @@ int main(void)
 
 
 	//init camera//
-		camera_GPIO_init();
-		tft_prints(0, 0, "Initing camera");
-		tft_update(0);
-		if (camera_init() == CAM_NOT_INITED || camera_init() == CAM_INIT_ERROR) {
-			tft_prints(0, 0, "No OV7725 module");
-		} else {
-			tft_prints(0, 0, "Inited");
-			cam_set_state(CAM_CAPTURING);
-		}
-		tft_update(0);
-		cam_set_window(0, 0, QQVGA_120x160);
-		cam_set_framesize(QQVGA_120x160);
-		cam_set_framerate(CAM_75FPS);
+	camera_GPIO_init();
+	tft_prints(0, 0, "Initing camera");
+	tft_update(0);
+	if (camera_init() == CAM_NOT_INITED || camera_init() == CAM_INIT_ERROR) {
+		tft_prints(0, 0, "No OV7725 module");
+	} 
+	else {
+		tft_prints(0, 0, "Inited");
+		cam_set_state(CAM_CAPTURING);
+	}
+	tft_update(0);
+	cam_set_window(0, 0, QQVGA_120x160);
+	cam_set_framesize(QQVGA_120x160);
+	cam_set_framerate(CAM_75FPS);
 
-		cam_set_lightmode(CAM_LIGHT_AUTO);
-		cam_set_effect(CAM_FX_NORMAL);
-		cam_set_brightness(0);
-		cam_set_saturation(0);
-		cam_set_contrast(0);
-
-
-		//init the pwm pins//
-		TIM10 ->ARR = 839;
-		TIM11 ->ARR = 839;
-		TIM5 ->ARR = 839;
-
-		TIM10 ->PSC = 9;
-		TIM11 ->PSC = 9;
-		TIM5 ->PSC = 9;
-
-		const uint16_t IMG_WIDTH = 120;
-		const uint16_t IMG_HEIGHT = 160;
+	cam_set_lightmode(CAM_LIGHT_AUTO);
+	cam_set_effect(CAM_FX_NORMAL);
+	cam_set_brightness(0);
+	cam_set_saturation(0);
+	cam_set_contrast(0);
 
 
+	//init the pwm pins//
+	TIM10 ->ARR = 839;
+	TIM11 ->ARR = 839;
+	TIM5 ->ARR = 839;
 
+	TIM10 ->PSC = 9;
+	TIM11 ->PSC = 9;
+	TIM5 ->PSC = 9;
 
+	const uint16_t IMG_WIDTH = 120;
+	const uint16_t IMG_HEIGHT = 160;
 
+	uint16_t image[IMG_HEIGHT*IMG_WIDTH];
+	uint16_t* image_ptr = image;
 
+	uint16_t img_data[IMG_HEIGHT*IMG_WIDTH];
+	uint16_t* img_data_ptr = img_data;
 
+	uint16_t processed_image[IMG_HEIGHT*IMG_WIDTH];
+	uint16_t* processed_image_ptr = processed_image;
 
-		uint16_t image[IMG_HEIGHT*IMG_WIDTH];
-		uint16_t* image_ptr = image;
+	while (1) 
+	{
+		gpio_reset(LED1);
+		//tft_prints(0,0,"Hello World!");
+		//tft_update(10);
+		cam_get_rgb565(image_ptr);
+		cam_rgb2printable(image_ptr, img_data_ptr);
+		//overallImgProcessor(IMG_WIDTH, IMG_HEIGHT, img_data_ptr, processed_image_ptr);
+		tft_print_image(img_data_ptr,0,0,120,160);
+		//overallImgProcessor(IMG_WIDTH, IMG_HEIGHT, img_data_ptr, processed_image_ptr);
 
-		uint16_t img_data[IMG_HEIGHT*IMG_WIDTH];
-		uint16_t* img_data_ptr = img_data;
-
-		uint16_t processed_image[IMG_HEIGHT*IMG_WIDTH];
-		uint16_t* processed_image_ptr = processed_image;
-
-		while (1) {
-			gpio_reset(LED1);
-			//tft_prints(0,0,"Hello World!");
-			//tft_update(10);
-			cam_get_rgb565(image_ptr);
-			cam_rgb2printable(image_ptr, img_data_ptr);
-//			overallImgProcessor(IMG_WIDTH, IMG_HEIGHT, img_data_ptr, processed_image_ptr);
-			tft_print_image(img_data_ptr,0,0,120,160);
-
-
-
-				//overallImgProcessor(IMG_WIDTH, IMG_HEIGHT, img_data_ptr, processed_image_ptr);
-
-				//tft_print_image(processed_image_ptr, 0, 0, 120, 160);
+		//tft_print_image(processed_image_ptr, 0, 0, 120, 160);
 
 	}
-  /* USER CODE END 3 */
+	  /* USER CODE END 3 */
 }
 
 /**
