@@ -135,6 +135,8 @@ int main(void) {
 		if (cam_is_frame_ready()) {
 			cam_get_rgb565(img);
 
+			// HI
+
 			cam_rgb2printable(img, printable);
 			tft_print_image(printable, 0, 0, cam_sizes[cam_get_framesize()].width,
 							cam_sizes[cam_get_framesize()].height);
@@ -142,7 +144,6 @@ int main(void) {
 			led_toggle(LED2);
 		}
 
-		// led blinky - useful for indicating the condition of the board
 		if (HAL_GetTick() - last_ticks >= 100) {
 			led_toggle(LED4);
 			last_ticks = HAL_GetTick();
