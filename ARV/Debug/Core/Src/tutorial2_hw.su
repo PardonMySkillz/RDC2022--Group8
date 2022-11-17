@@ -1,0 +1,5 @@
+../Core/Src/tutorial2_hw.c:37:23:read_button	16	static
+../Core/Src/tutorial2_hw.c:48:13:btn_state	8	static
+../Core/Src/tutorial2_hw.c:70:6:gpio_classwork	24	static
+../Core/Src/tutorial2_hw.c:135:6:tft_classwork	16	static
+../Core/Src/tutorial2_hw.c:156:6:tutorial2_homework	8	static
