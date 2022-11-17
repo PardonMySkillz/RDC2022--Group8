@@ -167,13 +167,13 @@ int main(void)
 		uint16_t* processed_image_ptr = processed_image;
 
 		while (1) {
-			//gpio_reset(LED1);
+			gpio_reset(LED1);
 			//tft_prints(0,0,"Hello World!");
 			//tft_update(10);
-//			cam_get_rgb565(image_ptr);
-//			cam_rgb2printable(image_ptr, img_data_ptr);
+			cam_get_rgb565(image_ptr);
+			cam_rgb2printable(image_ptr, img_data_ptr);
 //			overallImgProcessor(IMG_WIDTH, IMG_HEIGHT, img_data_ptr, processed_image_ptr);
-			//tft_print_image(processed_image_ptr,0,0,120,160);
+			tft_print_image(img_data_ptr,0,0,120,160);
 
 
 
