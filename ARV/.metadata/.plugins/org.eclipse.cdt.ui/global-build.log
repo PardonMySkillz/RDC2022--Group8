@@ -1,0 +1,95 @@
+14:58:01 **** Incremental Build of configuration Debug for project SW Tutorial 2022 ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F405xx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:103:3: warning: implicit declaration of function 'led_off' [-Wimplicit-function-declaration]
+  103 |   led_off(LED1);
+      |   ^~~~~~~
+../Core/Src/main.c:103:11: error: 'LED1' undeclared (first use in this function)
+  103 |   led_off(LED1);
+      |           ^~~~
+../Core/Src/main.c:103:11: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:104:10: error: 'LED2' undeclared (first use in this function)
+  104 |  led_off(LED2);
+      |          ^~~~
+../Core/Src/main.c:105:10: error: 'LED3' undeclared (first use in this function)
+  105 |  led_off(LED3);
+      |          ^~~~
+../Core/Src/main.c:106:10: error: 'LED4' undeclared (first use in this function)
+  106 |  led_off(LED4);
+      |          ^~~~
+../Core/Src/main.c:107:2: warning: implicit declaration of function 'tft_init' [-Wimplicit-function-declaration]
+  107 |  tft_init(PIN_ON_TOP, BLACK, WHITE, YELLOW, DARK_GREEN);
+      |  ^~~~~~~~
+../Core/Src/main.c:107:11: error: 'PIN_ON_TOP' undeclared (first use in this function)
+  107 |  tft_init(PIN_ON_TOP, BLACK, WHITE, YELLOW, DARK_GREEN);
+      |           ^~~~~~~~~~
+../Core/Src/main.c:107:23: error: 'BLACK' undeclared (first use in this function)
+  107 |  tft_init(PIN_ON_TOP, BLACK, WHITE, YELLOW, DARK_GREEN);
+      |                       ^~~~~
+../Core/Src/main.c:107:30: error: 'WHITE' undeclared (first use in this function)
+  107 |  tft_init(PIN_ON_TOP, BLACK, WHITE, YELLOW, DARK_GREEN);
+      |                              ^~~~~
+../Core/Src/main.c:107:37: error: 'YELLOW' undeclared (first use in this function)
+  107 |  tft_init(PIN_ON_TOP, BLACK, WHITE, YELLOW, DARK_GREEN);
+      |                                     ^~~~~~
+../Core/Src/main.c:107:45: error: 'DARK_GREEN' undeclared (first use in this function)
+  107 |  tft_init(PIN_ON_TOP, BLACK, WHITE, YELLOW, DARK_GREEN);
+      |                                             ^~~~~~~~~~
+../Core/Src/main.c:109:1: warning: implicit declaration of function 'camera_GPIO_init' [-Wimplicit-function-declaration]
+  109 | camera_GPIO_init();
+      | ^~~~~~~~~~~~~~~~
+../Core/Src/main.c:110:1: warning: implicit declaration of function 'tft_prints' [-Wimplicit-function-declaration]
+  110 | tft_prints(0, 0, "Initing camera");
+      | ^~~~~~~~~~
+../Core/Src/main.c:111:1: warning: implicit declaration of function 'tft_update' [-Wimplicit-function-declaration]
+  111 | tft_update(0);
+      | ^~~~~~~~~~
+../Core/Src/main.c:112:5: warning: implicit declaration of function 'camera_init' [-Wimplicit-function-declaration]
+  112 | if (camera_init() == CAM_NOT_INITED || camera_init() == CAM_INIT_ERROR) {
+      |     ^~~~~~~~~~~
+../Core/Src/main.c:112:22: error: 'CAM_NOT_INITED' undeclared (first use in this function)
+  112 | if (camera_init() == CAM_NOT_INITED || camera_init() == CAM_INIT_ERROR) {
+      |                      ^~~~~~~~~~~~~~
+../Core/Src/main.c:112:57: error: 'CAM_INIT_ERROR' undeclared (first use in this function); did you mean 'CAN_IT_ERROR'?
+  112 | if (camera_init() == CAM_NOT_INITED || camera_init() == CAM_INIT_ERROR) {
+      |                                                         ^~~~~~~~~~~~~~
+      |                                                         CAN_IT_ERROR
+../Core/Src/main.c:117:1: warning: implicit declaration of function 'cam_set_state' [-Wimplicit-function-declaration]
+  117 | cam_set_state(CAM_CAPTURING);
+      | ^~~~~~~~~~~~~
+../Core/Src/main.c:117:15: error: 'CAM_CAPTURING' undeclared (first use in this function)
+  117 | cam_set_state(CAM_CAPTURING);
+      |               ^~~~~~~~~~~~~
+../Core/Src/main.c:120:1: warning: implicit declaration of function 'cam_set_window' [-Wimplicit-function-declaration]
+  120 | cam_set_window(0, 0, QQVGA_120x160);
+      | ^~~~~~~~~~~~~~
+../Core/Src/main.c:120:22: error: 'QQVGA_120x160' undeclared (first use in this function)
+  120 | cam_set_window(0, 0, QQVGA_120x160);
+      |                      ^~~~~~~~~~~~~
+../Core/Src/main.c:123:1: warning: implicit declaration of function 'cam_set_colormode' [-Wimplicit-function-declaration]
+  123 | cam_set_colormode(CAM_GRAYSCALE);
+      | ^~~~~~~~~~~~~~~~~
+../Core/Src/main.c:123:19: error: 'CAM_GRAYSCALE' undeclared (first use in this function)
+  123 | cam_set_colormode(CAM_GRAYSCALE);
+      |                   ^~~~~~~~~~~~~
+../Core/Src/main.c:151:4: warning: implicit declaration of function 'gpio_reset' [-Wimplicit-function-declaration]
+  151 |    gpio_reset(LED1);
+      |    ^~~~~~~~~~
+../Core/Src/main.c:154:6: warning: implicit declaration of function 'cam_is_frame_ready' [-Wimplicit-function-declaration]
+  154 |  if (cam_is_frame_ready())
+      |      ^~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:156:3: warning: implicit declaration of function 'cam_get_rgb565' [-Wimplicit-function-declaration]
+  156 |   cam_get_rgb565(image);
+      |   ^~~~~~~~~~~~~~
+../Core/Src/main.c:157:3: warning: implicit declaration of function 'cam_rgb2printable' [-Wimplicit-function-declaration]
+  157 |   cam_rgb2printable(image, processed);
+      |   ^~~~~~~~~~~~~~~~~
+../Core/Src/main.c:158:3: warning: implicit declaration of function 'tft_print_image' [-Wimplicit-function-declaration]
+  158 |   tft_print_image(processed,0,0,120,160);
+      |   ^~~~~~~~~~~~~~~
+../Core/Src/main.c:164:3: warning: implicit declaration of function 'led_toggle' [-Wimplicit-function-declaration]
+  164 |   led_toggle(LED1);
+      |   ^~~~~~~~~~
+make: *** [Core/Src/subdir.mk:55: Core/Src/main.o] Error 1
+"make -j16 all" terminated with exit code 2. Build might be incomplete.
