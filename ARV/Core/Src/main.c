@@ -26,6 +26,7 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
+#include <math.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -84,28 +85,57 @@ void medianFilter(uint16_t width, uint16_t height, uint16_t* originaldataPtr, ui
     }
 }
 
-void sobelOperation(uint16_t width, uint16_t height, uint8_t* originalPTR, uint8_t* processed_dataPtr) {
-    int16_t window[9];
+void grayscale(uint16_t width, uint16_t height, uint16_t* originalPTR, uint16_t* processed_dataPtr)
+{
+	for (uint16_t x = 0; x < width; x++) //width
+	{
+		for (uint16_t y = 0; y < height; y++) //height
+		{
+			int16_t pixel = *(originalPTR + width * y + x);
+			uint16_t red = ((pixel & 0xF800) >> 11);
+			uint16_t green = ((pixel & 0x07E0) >> 5);
+			uint16_t blue = (pixel & 0x001F);
+
+			uint16_t magnitude = (red+green+blue)/3;
+			*(processed_dataPtr + width * y + x) = ((magnitude | *(processed_dataPtr + width * y + x)) << 6); // red
+			*(processed_dataPtr + width * y + x) = ((magnitude | *(processed_dataPtr + width * y + x)) << 5); // green
+			*(processed_dataPtr + width * y + x) = magnitude | *(processed_dataPtr + width * y + x); // blue
+		}
+	}
+}
+
+void sobelFilter(uint16_t width, uint16_t height, uint16_t* originalPTR, uint16_t* processed_dataPtr) {
+    int16_t window[9]; //set an array to store values of 3x3 matrix
     int16_t gx[] = {1,0,-1,2,0,-2,1,0,-1};
     int16_t gy[] = {1,2,1,0,0,0,-1,-2,-1};
 
-    for (uint16_t x=1; x<width-1; x++) {
-        for (uint16_t y=1; y<height-1; y++) {
+    for (uint16_t x=1; x<width-1; x++) //outer edge of image will be ignored
+    {
+        for (uint16_t y=1; y<height-1; y++) //outer edge of image will be ignored
+        {
+        	//fill the 3x3 window
             uint8_t k =0;
-            for (int u=x-1; u <=x+1; u++) {
-                for (int v=y-1; v<=y+1; v++) {
-                    window[k++] = *(originalPTR + width*v+u);
+            for (int u=x-1; u <=x+1; u++) //horizontal
+            {
+                for (int v=y-1; v<=y+1; v++) //vertical
+                {
+                    window[k++] = *(originalPTR + width * v + u);
                 }
             }
-            //do sobel operation gx^2 + gy^2
-            int8_t x_overall =0;
-            int8_t y_overall = 0;
-            for (uint16_t i=0; i<9; i++) {
-                x_overall += window[i]*gx[i];
-                y_overall += window[i]*gy[i];
+            //Pass through SobelFilter
+            int8_t sumX = 0;
+            int8_t sumY = 0;
+
+            for (uint16_t i = 0; i < 9; i++)
+            {
+            	uint16_t blue = (window[i] & 0x001F);
+                sumX += blue*gx[i];
+                sumY += blue*gy[i];
             }
-            int16_t sobel_pixel = sqrt(pow(x_overall,2) + pow(y_overall,2));
-            *(processed_dataPtr  +width*y+x) = sobel_pixel;
+            uint16_t magnitudeBlue = sqrt(pow(sumX, 2) + pow(sumY, 2));
+            *(processed_dataPtr + width * y + x) = ((magnitudeBlue | *(processed_dataPtr + width * y + x)) << 6); // red
+            *(processed_dataPtr + width * y + x) = ((magnitudeBlue | *(processed_dataPtr + width * y + x)) << 5); // green
+            *(processed_dataPtr + width * y + x) = magnitudeBlue | *(processed_dataPtr + width * y + x); // blue
         }
     }
 }
@@ -179,7 +209,7 @@ int main(void)
   	tft_update(0);
   	cam_set_window(0, 0, QQVGA_120x160);
 //  	cam_set_framesize(QQVGA_120x160);
-//  	cam_set_framerate(CAM_75FPS);
+  	cam_set_framerate(CAM_75FPS);
   	cam_set_colormode(CAM_GRAYSCALE);
   //	cam_set_lightmode(CAM_LIGHT_AUTO);
   //	cam_set_effect(CAM_FX_BW);
@@ -204,6 +234,8 @@ int main(void)
 //  	uint16_t img_data[IMG_HEIGHT*IMG_WIDTH] = {0};
   	uint16_t processed[IMG_HEIGHT*IMG_WIDTH] = {0};
 
+  	//uint16_t printable[IMG_HEIGHT*IMG_WIDTH] = {0};
+
   	while (1)
   	{
 //  		gpio_reset(LED1);
@@ -211,8 +243,15 @@ int main(void)
   		//tft_update(10);
   		if (cam_is_frame_ready())
   		{
+  			//Get image from camera
   			cam_get_rgb565(image);
+  			//Commence Grayscale
+  			grayscale(IMG_WIDTH, IMG_HEIGHT, image, processed);
+  			//Commence SobelOperation:
+  			sobelFilter(IMG_WIDTH, IMG_HEIGHT, processed, image);
+  			//Convert image into printable
   			cam_rgb2printable(image, processed);
+  			//Print Image
   			tft_print_image(processed,0,0,120,160);
   		}
   		//overallImgProcessor(IMG_WIDTH, IMG_HEIGHT, img_data_ptr, processed_image_ptr);
