@@ -96,10 +96,10 @@ void grayscale(uint16_t width, uint16_t height, uint16_t* originalPTR, uint16_t*
 			uint16_t green = ((pixel & 0x07E0) >> 5);
 			uint16_t blue = (pixel & 0x001F);
 
-			uint16_t magnitude = (red+green+blue)/3;
-			*(processed_dataPtr + width * y + x) = ((magnitude | *(processed_dataPtr + width * y + x)) << 6); // red
+			uint16_t magnitude = ((red*2)+green+(blue*2))/3;
+			*(processed_dataPtr + width * y + x) = ((magnitude/2 | *(processed_dataPtr + width * y + x)) << 6); // red
 			*(processed_dataPtr + width * y + x) = ((magnitude | *(processed_dataPtr + width * y + x)) << 5); // green
-			*(processed_dataPtr + width * y + x) = magnitude | *(processed_dataPtr + width * y + x); // blue
+			*(processed_dataPtr + width * y + x) = magnitude/2 | *(processed_dataPtr + width * y + x); // blue
 		}
 	}
 }
@@ -123,8 +123,8 @@ void sobelFilter(uint16_t width, uint16_t height, uint16_t* originalPTR, uint16_
                 }
             }
             //Pass through SobelFilter
-            int8_t sumX = 0;
-            int8_t sumY = 0;
+            int16_t sumX = 0;
+            int16_t sumY = 0;
 
             for (uint16_t i = 0; i < 9; i++)
             {
@@ -132,9 +132,9 @@ void sobelFilter(uint16_t width, uint16_t height, uint16_t* originalPTR, uint16_
                 sumX += blue*gx[i];
                 sumY += blue*gy[i];
             }
-            uint16_t magnitudeBlue = sqrt(pow(sumX, 2) + pow(sumY, 2));
+            uint16_t magnitudeBlue = sqrt(pow(sumX, 2) + pow(sumY, 2))/5;
             *(processed_dataPtr + width * y + x) = ((magnitudeBlue | *(processed_dataPtr + width * y + x)) << 6); // red
-            *(processed_dataPtr + width * y + x) = ((magnitudeBlue | *(processed_dataPtr + width * y + x)) << 5); // green
+            *(processed_dataPtr + width * y + x) = ((magnitudeBlue *2 | *(processed_dataPtr + width * y + x)) << 5); // green
             *(processed_dataPtr + width * y + x) = magnitudeBlue | *(processed_dataPtr + width * y + x); // blue
         }
     }
@@ -209,9 +209,9 @@ int main(void)
   	tft_update(0);
   	cam_set_window(0, 0, QQVGA_120x160);
 //  	cam_set_framesize(QQVGA_120x160);
-  	cam_set_framerate(CAM_75FPS);
+  	//cam_set_framerate(CAM_75FPS);
   	cam_set_colormode(CAM_GRAYSCALE);
-  //	cam_set_lightmode(CAM_LIGHT_AUTO);
+  	cam_set_lightmode(CAM_LIGHT_AUTO);
   //	cam_set_effect(CAM_FX_BW);
   //	cam_set_brightness(0);
   //	cam_set_saturation(0);
@@ -246,20 +246,21 @@ int main(void)
   			//Get image from camera
   			cam_get_rgb565(image);
   			//Commence Grayscale
-  			grayscale(IMG_WIDTH, IMG_HEIGHT, image, processed);
+  			//grayscale(IMG_WIDTH, IMG_HEIGHT, image, processed);
   			//Commence SobelOperation:
-  			sobelFilter(IMG_WIDTH, IMG_HEIGHT, processed, image);
+  			sobelFilter(IMG_WIDTH, IMG_HEIGHT, image, processed);
   			//Convert image into printable
-  			cam_rgb2printable(image, processed);
+  			cam_rgb2printable(processed, processed);
   			//Print Image
   			tft_print_image(processed,0,0,120,160);
+
   		}
   		//overallImgProcessor(IMG_WIDTH, IMG_HEIGHT, img_data_ptr, processed_image_ptr);
-  		static uint32_t last_ticks = 0;
-  		if (HAL_GetTick() - last_ticks > 100) {
-  			last_ticks = HAL_GetTick();
-  			led_toggle(LED1);
-  		}
+  		//static uint32_t last_ticks = 0;
+  		//if (HAL_GetTick() - last_ticks > 100) {
+  		//	last_ticks = HAL_GetTick();
+  		//	led_toggle(LED1);
+  		//}
 
   		//tft_print_image(processed_image_ptr, 0, 0, 120, 160);
 
