@@ -1,0 +1,12 @@
+../Core/Src/sccb.c:8:6:SCCB_GPIO_init	32	static
+../Core/Src/sccb.c:23:20:delay_us	16	static
+../Core/Src/sccb.c:29:20:SCCB_delay	8	static
+../Core/Src/sccb.c:36:25:SCCB_start	8	static
+../Core/Src/sccb.c:51:20:SCCB_stop	8	static
+../Core/Src/sccb.c:62:20:SCCB_ack	8	static
+../Core/Src/sccb.c:73:20:SCCB_noAck	8	static
+../Core/Src/sccb.c:84:25:SCCB_waitAck	8	static
+../Core/Src/sccb.c:99:20:SCCB_TxByte	24	static
+../Core/Src/sccb.c:117:23:SCCB_RxByte	16	static
+../Core/Src/sccb.c:136:11:SCCB_send_byte	16	static
+../Core/Src/sccb.c:153:11:SCCB_read_byte	16	static
