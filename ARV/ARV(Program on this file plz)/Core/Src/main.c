@@ -144,6 +144,8 @@ void overallImgProcessor(uint16_t width, uint16_t height, uint16_t* originaldata
 	medianFilter(width, height, originaldataPtr, processed_dataPtr);
 	sobelOperation( width, height, originaldataPtr, processed_dataPtr);
 }
+
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -220,13 +222,13 @@ int main(void)
 
 
   	//init the pwm pins//
-  //	TIM10 ->ARR = 839;
-  //	TIM11 ->ARR = 839;
-  //	TIM5 ->ARR = 839;
+  	TIM10 ->ARR = 839;
+  	TIM11 ->ARR = 839;
+  	TIM5 ->ARR = 839;
   //
-  //	TIM10 ->PSC = 9;
-  //	TIM11 ->PSC = 9;
-  //	TIM5 ->PSC = 9;
+  	TIM10 ->PSC = 9;
+  	TIM11 ->PSC = 9;
+  	TIM5 ->PSC = 9;
 
 #define IMG_WIDTH 120
 #define IMG_HEIGHT 160
@@ -255,7 +257,13 @@ int main(void)
   			//Print Image
   			tft_print_image(processed,0,0,120,160);
 
+
+
   		}
+  		//test motor
+  		motor_forward();
+
+
   		//overallImgProcessor(IMG_WIDTH, IMG_HEIGHT, img_data_ptr, processed_image_ptr);
   		//static uint32_t last_ticks = 0;
   		//if (HAL_GetTick() - last_ticks > 100) {
@@ -339,6 +347,15 @@ void Error_Handler(void)
 	__disable_irq();
 	while (1) {}
   /* USER CODE END Error_Handler_Debug */
+}
+
+
+void motor_forward() {
+	gpio_reset(IN1);
+	gpio_set(IN2);
+	gpio_reset(IN3);
+	gpio_set(IN4);
+
 }
 
 #ifdef  USE_FULL_ASSERT

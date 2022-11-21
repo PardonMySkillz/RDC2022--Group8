@@ -61,11 +61,11 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOB, TFT_BL_Pin|CAM_WEN_Pin|CAM_RCLK_Pin|LED4_Pin
                           |LED3_Pin|LED2_Pin|LED1_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : PCPin PC0 PC1 PC2
-                           PC3 PCPin PCPin PCPin
+  /*Configure GPIO pins : PCPin PCPin PCPin PCPin
+                           PCPin PCPin PCPin PCPin
                            PCPin PCPin PCPin PCPin */
-  GPIO_InitStruct.Pin = CAM_D7_Pin|GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2
-                          |GPIO_PIN_3|CAM_D0_Pin|CAM_D1_Pin|CAM_D2_Pin
+  GPIO_InitStruct.Pin = CAM_D7_Pin|IN1_Pin|IN2_Pin|IN3_Pin
+                          |IN4_Pin|CAM_D0_Pin|CAM_D1_Pin|CAM_D2_Pin
                           |CAM_D3_Pin|CAM_D4_Pin|CAM_D5_Pin|CAM_D6_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
