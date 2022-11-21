@@ -1,7 +1,7 @@
-../Core/Src/main.c:63:6:medianFilter	56	static
-../Core/Src/main.c:88:6:grayscale	40	static
-../Core/Src/main.c:107:6:sobelFilter	120	static
-../Core/Src/main.c:143:6:overallImgProcessor	24	static
-../Core/Src/main.c:159:5:main	76816	static
-../Core/Src/main.c:285:6:SystemClock_Config	88	static
-../Core/Src/main.c:334:6:Error_Handler	4	static,ignoring_inline_asm
+../Core/Src/main.c:62:6:medianFilter	56	static
+../Core/Src/main.c:87:6:grayscale	40	static
+../Core/Src/main.c:106:6:sobelFilter	120	static
+../Core/Src/main.c:142:6:overallImgProcessor	24	static
+../Core/Src/main.c:158:5:main	76816	static
+../Core/Src/main.c:286:6:SystemClock_Config	88	static
+../Core/Src/main.c:335:6:Error_Handler	4	static,ignoring_inline_asm

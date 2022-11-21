@@ -26,7 +26,6 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-#include <math.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -182,13 +181,15 @@ int main(void)
   MX_GPIO_Init();
   MX_CAN1_Init();
   MX_CAN2_Init();
-//  MX_SPI1_Init();
+  MX_SPI1_Init();
   MX_USART1_UART_Init();
-//  MX_I2C2_Init();
+  MX_I2C2_Init();
   MX_DMA_Init();
   MX_USART2_UART_Init();
   MX_TIM5_Init();
   MX_TIM6_Init();
+  MX_TIM10_Init();
+  MX_TIM11_Init();
   /* USER CODE BEGIN 2 */
   led_off(LED1);
   led_off(LED2);

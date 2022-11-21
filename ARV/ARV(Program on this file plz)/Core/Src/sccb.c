@@ -3,7 +3,7 @@
 #include "tim.h"
 
 #include "stm32f4xx.h"
-#define SCCB_TIMER htim6
+#define SCCB_TIMER htim5
 
 void SCCB_GPIO_init(void) {
 	GPIO_InitTypeDef GPIO_InitStructure = {0};
