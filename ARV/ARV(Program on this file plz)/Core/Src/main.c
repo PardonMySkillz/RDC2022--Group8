@@ -122,8 +122,8 @@ void sobelFilter(uint16_t width, uint16_t height, uint16_t* originalPTR, uint16_
                 }
             }
             //Pass through SobelFilter
-            int16_t sumX = 0;
-            int16_t sumY = 0;
+            int8_t sumX = 0;
+            int8_t sumY = 0;
 
             for (uint16_t i = 0; i < 9; i++)
             {
@@ -131,20 +131,15 @@ void sobelFilter(uint16_t width, uint16_t height, uint16_t* originalPTR, uint16_
                 sumX += blue*gx[i];
                 sumY += blue*gy[i];
             }
-            uint16_t magnitudeBlue = sqrt(pow(sumX, 2) + pow(sumY, 2))/5;
-            *(processed_dataPtr + width * y + x) = ((magnitudeBlue | *(processed_dataPtr + width * y + x)) << 6); // red
-            *(processed_dataPtr + width * y + x) = ((magnitudeBlue *2 | *(processed_dataPtr + width * y + x)) << 5); // green
-            *(processed_dataPtr + width * y + x) = magnitudeBlue | *(processed_dataPtr + width * y + x); // blue
+            uint16_t magnitudeBlue = sqrt(pow(sumX, 2) + pow(sumY, 2));
+
+            uint16_t temporary = ((magnitudeBlue | temporary) << 6); // red
+            temporary = (((magnitudeBlue * 2)+1) | temporary) << 5; // green
+            temporary = magnitudeBlue | temporary; // blue
+            *(processed_dataPtr + width * y + x) = temporary;
         }
     }
 }
-
-void overallImgProcessor(uint16_t width, uint16_t height, uint16_t* originaldataPtr, uint8_t* processed_dataPtr) {
-	image_processing_to_gray_scale(width, height, originaldataPtr, processed_dataPtr);
-	medianFilter(width, height, originaldataPtr, processed_dataPtr);
-	sobelOperation( width, height, originaldataPtr, processed_dataPtr);
-}
-
 
 /* USER CODE END PFP */
 
@@ -253,38 +248,14 @@ int main(void)
   			//Commence SobelOperation:
   			sobelFilter(IMG_WIDTH, IMG_HEIGHT, image, processed);
   			//Convert image into printable
-  			cam_rgb2printable(processed, processed);
+  			cam_rgb2printable(processed, image);
   			//Print Image
-  			tft_print_image(processed,0,0,120,160);
-
-
-
+  			tft_print_image(image,0,0,120,160);
   		}
   		//test motor
   		motor_forward();
-
-
-  		//overallImgProcessor(IMG_WIDTH, IMG_HEIGHT, img_data_ptr, processed_image_ptr);
-  		//static uint32_t last_ticks = 0;
-  		//if (HAL_GetTick() - last_ticks > 100) {
-  		//	last_ticks = HAL_GetTick();
-  		//	led_toggle(LED1);
-  		//}
-
-  		//tft_print_image(processed_image_ptr, 0, 0, 120, 160);
-
   	}
   /* USER CODE END 2 */
-
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
-  }
-  /* USER CODE END 3 */
 }
 
 /**
