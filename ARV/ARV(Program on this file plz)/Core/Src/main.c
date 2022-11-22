@@ -26,6 +26,7 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
+#include "math.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -141,11 +142,33 @@ void sobelFilter(uint16_t width, uint16_t height, uint16_t* originalPTR, uint16_
     }
 }
 
+void pwm_init(void) {
+	// init the pwm prescaler value and auto-reload value and start the pwm
+	/* Your code start here */
+	HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_1); //servoMotor
+	TIM5->ARR = 39999;
+	TIM5->PSC = 41;
+	TIM5->CCR1 = 2999;
+	HAL_TIM_PWM_Start(&htim10, TIM_CHANNEL_1); //leftMotor
+	TIM10->ARR = 839;
+	TIM10->PSC = 9;
+	TIM10->CCR1 = 0;
+	HAL_TIM_PWM_Start(&htim11, TIM_CHANNEL_1); //rightMotor
+	TIM11->ARR = 839;
+	TIM11->PSC = 9;
+	TIM11->CCR1 = 0;
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+void forward()
+{
+	gpio_reset(IN1);
+	gpio_set(IN2);
+	gpio_reset(IN3);
+	gpio_set(IN4);
+}
 /* USER CODE END 0 */
 
 /**
@@ -155,7 +178,7 @@ void sobelFilter(uint16_t width, uint16_t height, uint16_t* originalPTR, uint16_
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	pwm_init();
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -178,13 +201,12 @@ int main(void)
   MX_GPIO_Init();
   MX_CAN1_Init();
   MX_CAN2_Init();
-  MX_SPI1_Init();
+  //MX_SPI1_Init();
   MX_USART1_UART_Init();
   MX_I2C2_Init();
   MX_DMA_Init();
   MX_USART2_UART_Init();
   MX_TIM5_Init();
-  MX_TIM6_Init();
   MX_TIM10_Init();
   MX_TIM11_Init();
   /* USER CODE BEGIN 2 */
@@ -217,13 +239,7 @@ int main(void)
 
 
   	//init the pwm pins//
-  	TIM10 ->ARR = 839;
-  	TIM11 ->ARR = 839;
-  	TIM5 ->ARR = 839;
-  //
-  	TIM10 ->PSC = 9;
-  	TIM11 ->PSC = 9;
-  	TIM5 ->PSC = 9;
+
 
 #define IMG_WIDTH 120
 #define IMG_HEIGHT 160
@@ -232,19 +248,17 @@ int main(void)
 //  	uint16_t img_data[IMG_HEIGHT*IMG_WIDTH] = {0};
   	uint16_t processed[IMG_HEIGHT*IMG_WIDTH] = {0};
 
+
+
+
   	//uint16_t printable[IMG_HEIGHT*IMG_WIDTH] = {0};
 
   	while (1)
   	{
-//  		gpio_reset(LED1);
-  		//tft_prints(0,0,"Hello World!");
-  		//tft_update(10);
   		if (cam_is_frame_ready())
   		{
   			//Get image from camera
   			cam_get_rgb565(image);
-  			//Commence Grayscale
-  			//grayscale(IMG_WIDTH, IMG_HEIGHT, image, processed);
   			//Commence SobelOperation:
   			sobelFilter(IMG_WIDTH, IMG_HEIGHT, image, processed);
   			//Convert image into printable
@@ -252,10 +266,17 @@ int main(void)
   			//Print Image
   			tft_print_image(image,0,0,120,160);
   		}
-  		//test motor
-  		motor_forward();
+  		//Motors
+  		TIM10->CCR1 = 839;
+  		TIM11->CCR1 = 839;
+  		forward();
+
   	}
   /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  /* USER CODE END 3 */
 }
 
 /**
@@ -318,15 +339,6 @@ void Error_Handler(void)
 	__disable_irq();
 	while (1) {}
   /* USER CODE END Error_Handler_Debug */
-}
-
-
-void motor_forward() {
-	gpio_reset(IN1);
-	gpio_set(IN2);
-	gpio_reset(IN3);
-	gpio_set(IN4);
-
 }
 
 #ifdef  USE_FULL_ASSERT
