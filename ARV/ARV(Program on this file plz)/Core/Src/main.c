@@ -26,7 +26,7 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-#include "math.h"
+#include <math.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -38,49 +38,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-	typedef enum {
-	    BOTH_BTN, BTN1_ONLY, BTN2_ONLY, ALL_OFF,
-	} ButtonState;
 
-	typedef enum {
-	    BUTTON1, BUTTON2,
-
-	    //This trick means the NumButtons will equal how many buttons there are (how many enum values)
-	    //This works as long as the enum values are simple (count up from 0)
-	    NUM_BUTTON,
-	} Button;
-
-	typedef enum {
-	    LED1, LED2, LED3, LED4, NUM_LED,
-	} LED;
-
-	/**
-	 * @brief read the button state
-	 * return 1 if the button is pressed;
-	 * return 0 if the button is released;
-	 */
-	static inline uint8_t read_button(Button btn) {
-	    switch (btn) {
-	    case BUTTON1:
-	        return !btn_read(BTN1);
-	    case BUTTON2:
-	        return !btn_read(BTN2);
-	    default:
-	        return 0;
-	    }
-	}
-
-	static ButtonState btn_state(void) {
-	    if (read_button(BUTTON1) && read_button(BUTTON2)) {
-	        return BOTH_BTN;
-	    } else if (read_button(BUTTON1)) {
-	        return BTN1_ONLY;
-	    } else if (read_button(BUTTON2)) {
-	        return BTN2_ONLY;
-	    } else {
-	        return ALL_OFF;
-	    }
-	}
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -174,11 +132,12 @@ void sobelFilter(uint16_t width, uint16_t height, uint16_t* originalPTR, uint16_
                 sumX += blue*gx[i];
                 sumY += blue*gy[i];
             }
-            uint16_t magnitudeBlue = sqrt(pow(sumX, 2) + pow(sumY, 2));
+            uint16_t magnitudeBlue = sqrt(pow(sumX, 2) + pow(sumY, 2))/6;
 
-            uint16_t temporary = ((magnitudeBlue | temporary) << 6); // red
-            temporary = (((magnitudeBlue * 2)+1) | temporary) << 5; // green
-            temporary = magnitudeBlue | temporary; // blue
+            uint16_t temporary =  ((((magnitudeBlue * 2)+1) | (magnitudeBlue << 6)) << 5) | magnitudeBlue;
+            //uint16_t temporary = ((magnitudeBlue | temporary) << 6); // red
+            //temporary = (((magnitudeBlue * 2)+1) | temporary) << 5; // green
+            //temporary = magnitudeBlue | temporary; // blue
             *(processed_dataPtr + width * y + x) = temporary;
         }
     }
@@ -220,7 +179,7 @@ void forward()
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	pwm_init();
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -256,7 +215,7 @@ int main(void)
   led_off(LED2);
   led_off(LED3);
   led_off(LED4);
-  tft_init(PIN_ON_TOP, BLACK, WHITE, YELLOW, DARK_GREEN);
+  tft_init(PIN_ON_BOTTOM, BLACK, WHITE, YELLOW, DARK_GREEN);
 
   camera_GPIO_init();
   	tft_prints(0, 0, "Initing camera");
@@ -269,29 +228,26 @@ int main(void)
   		cam_set_state(CAM_CAPTURING);
   	}
   	tft_update(0);
-  	cam_set_window(0, 0, QQVGA_120x160);
+  	cam_set_window(60, 0, QQVGA_120x160);
 //  	cam_set_framesize(QQVGA_120x160);
-  	//cam_set_framerate(CAM_75FPS);
+  	cam_set_framerate(CAM_75FPS);
   	cam_set_colormode(CAM_GRAYSCALE);
-  	cam_set_lightmode(CAM_LIGHT_AUTO);
+//  	cam_set_lightmode(CAM_LIGHT_AUTO);
   //	cam_set_effect(CAM_FX_BW);
   //	cam_set_brightness(0);
-  //	cam_set_saturation(0);
+  //
+  //cam_set_saturation(0);
   //	cam_set_contrast(0);
-
-
-  	//init the pwm pins//
-
+  //	init the pwm pins//
+  	pwm_init();
 
 #define IMG_WIDTH 120
 #define IMG_HEIGHT 160
+  	const int WIDTH = cam_sizes[cam_get_framesize()].width, HEIGHT = cam_sizes[cam_get_framesize()].height;
 
-  	uint16_t image[IMG_HEIGHT*IMG_WIDTH] = {0};
+  	uint16_t image[HEIGHT*WIDTH];
 //  	uint16_t img_data[IMG_HEIGHT*IMG_WIDTH] = {0};
-  	uint16_t processed[IMG_HEIGHT*IMG_WIDTH] = {0};
-
-
-
+  	uint16_t processed[HEIGHT*WIDTH];
 
   	//uint16_t printable[IMG_HEIGHT*IMG_WIDTH] = {0};
 
@@ -302,27 +258,21 @@ int main(void)
   			//Get image from camera
   			cam_get_rgb565(image);
   			//Commence SobelOperation:
-  			sobelFilter(IMG_WIDTH, IMG_HEIGHT, image, processed);
-  			//Convert image into printable
+  			sobelFilter(WIDTH, HEIGHT, image, processed);
+
   			cam_rgb2printable(processed, image);
   			//Print Image
-  			tft_print_image(image,0,0,120,160);
+  			tft_print_image(image,0,0,WIDTH,HEIGHT);
+
   		}
   		//Motors
+
   		TIM10->CCR1 = 839;
   		TIM11->CCR1 = 839;
-
-  		if (btn_state == ALL_OFF){
-  			gpio_toggle(LED1);
-  		}
-  		forward();
+  		//forward();
 
   	}
   /* USER CODE END 2 */
-
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  /* USER CODE END 3 */
 }
 
 /**
