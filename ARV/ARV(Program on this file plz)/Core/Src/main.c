@@ -170,6 +170,38 @@ void forward()
 	gpio_reset(IN3);
 	gpio_set(IN4);
 }
+
+void steering_algorithim(const uint16_t image[WIDTH][HEIGHT], uint16_t* image_ptr) {
+	uint16_t = a;
+	uint16_t = b;
+	for (int i = IMG_WIDTH*IMG_HEIGHT/2; i <IMG_WIDTH*IMG_HEIGHT/2+IMG_WIDTH/2; i++) {
+		if ((*(image_ptr+i) &0x001f) >50) {
+			a = 1; //lefty
+		}
+	}
+	for (int j =  IMG_WIDTH*IMG_HEIGHT/2 + IMG_WIDTH-1; j >IMG_WIDTH*IMG_HEIGHT/2+IMG_WIDTH/2; j--) {
+		if (*(image_ptr+j) & 0x001f > 50) {
+			b = 1; //right
+		}
+	}
+	if (a && b) {  //move forward
+		forward();
+		TIM5->CCR1 =
+	}
+	else if (!a && b) { //turn left
+		forward();
+		TIM5->CCR1 =
+	}
+	else if (a && !b) {  //turn right
+		forward();
+		TIM5->CCR1 =
+	}
+	else {
+		forward();
+	}
+
+}
+
 /* USER CODE END 0 */
 
 /**

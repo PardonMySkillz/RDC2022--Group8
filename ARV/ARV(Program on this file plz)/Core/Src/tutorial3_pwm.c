@@ -54,12 +54,12 @@ static ButtonState btn_state(void) {
 }
 
 
-void pwm_init(void) {
-	// init the pwm prescaler value and auto-reload value and start the pwm
-	/* Your code start here */
-
-	/* Your code end here */
-}
+//void pwm_init(void) {
+//	// init the pwm prescaler value and auto-reload value and start the pwm
+//	/* Your code start here */
+//
+//	/* Your code end here */
+//}
 
 void pwm_classwork(void) {
 	/* Your code start here */
