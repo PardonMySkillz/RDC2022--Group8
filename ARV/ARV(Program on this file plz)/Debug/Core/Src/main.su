@@ -3,6 +3,7 @@
 ../Core/Src/main.c:107:6:sobelFilter	120	static
 ../Core/Src/main.c:146:6:pwm_init	8	static
 ../Core/Src/main.c:166:6:forward	8	static
-../Core/Src/main.c:179:5:main	72	dynamic
-../Core/Src/main.c:282:6:SystemClock_Config	88	static
-../Core/Src/main.c:331:6:Error_Handler	4	static,ignoring_inline_asm
+../Core/Src/main.c:174:6:steering_algorithm	32	static
+../Core/Src/main.c:236:5:main	72	dynamic
+../Core/Src/main.c:339:6:SystemClock_Config	88	static
+../Core/Src/main.c:388:6:Error_Handler	4	static,ignoring_inline_asm

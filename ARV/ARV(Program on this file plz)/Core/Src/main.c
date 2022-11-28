@@ -171,35 +171,60 @@ void forward()
 	gpio_set(IN4);
 }
 
-void steering_algorithim(const uint16_t image[WIDTH][HEIGHT], uint16_t* image_ptr) {
-	uint16_t = a;
-	uint16_t = b;
-	for (int i = IMG_WIDTH*IMG_HEIGHT/2; i <IMG_WIDTH*IMG_HEIGHT/2+IMG_WIDTH/2; i++) {
-		if ((*(image_ptr+i) &0x001f) >50) {
-			a = 1; //lefty
-		}
-	}
-	for (int j =  IMG_WIDTH*IMG_HEIGHT/2 + IMG_WIDTH-1; j >IMG_WIDTH*IMG_HEIGHT/2+IMG_WIDTH/2; j--) {
-		if (*(image_ptr+j) & 0x001f > 50) {
-			b = 1; //right
-		}
-	}
-	if (a && b) {  //move forward
-		forward();
-		TIM5->CCR1 =
-	}
-	else if (!a && b) { //turn left
-		forward();
-		TIM5->CCR1 =
-	}
-	else if (a && !b) {  //turn right
-		forward();
-		TIM5->CCR1 =
-	}
-	else {
-		forward();
-	}
+void steering_algorithm(uint16_t* image, uint16_t width, uint16_t height)
+{
+    uint16_t a = 0;
+    uint16_t b = 0;
+    uint8_t aTrigger = 0;
+    uint8_t bTrigger = 0;
+    uint16_t trigger = 0;
+    for (uint16_t i = width*height/2; i < width * (height/2 + 1); i++) //Detect if there are white pixels
+    	{
+    		uint8_t blue = image[i] & 0x001F;
+			if (blue > 25) //25 is boundary between black and white
+			{
+				trigger++;
+			}
+    	}
 
+    if (trigger > 10) //if there are 10 white pixels or more, move forward
+    {
+    	//set TIM5->CCR1 duty cycle
+    	forward();
+    }
+    else
+    {
+    	for (uint16_t j = width/4; j < height * width; j+= width) //check for positions of a and b to determine left/right steering
+    	{
+    		uint8_t blue1 = image[j] & 0x001F;
+    		uint8_t blue2 = image[j+width/2] & 0x001F;
+    		if (blue1 > 25 && aTrigger == 0)
+    		{
+    			a = j;
+    			aTrigger = 1;
+    		}
+    		if (blue2 > 25 && bTrigger == 0)
+    		{
+    			b = j;
+    			bTrigger = 1;
+    		}
+    		if (aTrigger == 1 && bTrigger == 1)
+    		{
+    			break;
+    		}
+    	}
+
+    	if (a < b)
+    	{
+    		//set TIM5->CCR1 duty cycle
+    		left();
+    	}
+    	else if (a > b)
+    	{
+    		//set TIM5->CCR1 duty cycle
+    		right();
+    	}
+    }
 }
 
 /* USER CODE END 0 */
