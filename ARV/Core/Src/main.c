@@ -219,13 +219,17 @@ int main(void)
 
 
   	//init the pwm pins//
-  //	TIM10 ->ARR = 839;
-  //	TIM11 ->ARR = 839;
-  //	TIM5 ->ARR = 839;
-  //
-  //	TIM10 ->PSC = 9;
-  //	TIM11 ->PSC = 9;
-  //	TIM5 ->PSC = 9;
+  	TIM10->ARR = 39999;
+	TIM10->PSC = 41;
+	TIM10->CCR1 = 0;
+	HAL_TIM_PWM_Start(&htim10, TIM_CHANNEL_1); //leftMotor
+
+	TIM11->ARR = 39999;
+	TIM11->PSC = 41;
+	TIM11->CCR1 = 0;
+	HAL_TIM_PWM_Start(&htim11, TIM_CHANNEL_1); //rightMotor
+	
+	
 
 #define IMG_WIDTH 120
 #define IMG_HEIGHT 160
