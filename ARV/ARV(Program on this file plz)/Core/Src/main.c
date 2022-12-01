@@ -290,7 +290,7 @@ int main(void)
   		cam_set_state(CAM_CAPTURING);
   	}
   	tft_update(0);
-  	cam_set_window(60, 0, QQVGA_120x160);
+  	cam_set_window(150, 0, QQVGA_120x160);
 //  	cam_set_framesize(QQVGA_120x160);
   	cam_set_framerate(CAM_75FPS);
   	cam_set_colormode(CAM_GRAYSCALE);
