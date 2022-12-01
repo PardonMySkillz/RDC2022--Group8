@@ -171,60 +171,65 @@ void forward()
 	gpio_set(IN4);
 }
 
-void steering_algorithm(uint16_t* image, uint16_t width, uint16_t height)
+void steeringAlgorithm(uint16_t* image, uint16_t width, uint16_t height)
 {
     uint16_t a = 0;
     uint16_t b = 0;
+    uint8_t aCounter = 0;
+    uint8_t bCounter = 0;
     uint8_t aTrigger = 0;
     uint8_t bTrigger = 0;
-    uint16_t trigger = 0;
-    for (uint16_t i = width*height/2; i < width * (height/2 + 1); i++) //Detect if there are white pixels
-    	{
-    		uint8_t blue = image[i] & 0x001F;
-			if (blue > 25) //25 is boundary between black and white
-			{
-				trigger++;
-			}
-    	}
 
-    if (trigger > 10) //if there are 10 white pixels or more, move forward
+    for (uint16_t i = 1; i < width - 1; i++) //width
     {
-    	//set TIM5->CCR1 duty cycle
-    	forward();
+        uint16_t green1 = (*(image + width * (height - (height/7)) + i) & 0x07E0) >> 5;
+        uint16_t green2 = (*(image + width * (height - (height/9)) + i) & 0x07E0) >> 5;
+        if (green1 > 6 && aTrigger == 0)
+        {
+            aCounter++;
+            if (aCounter > 2)
+            {
+            	a = i;
+            	aTrigger++;
+            }
+        }
+        else
+        {
+        	aCounter = 0;
+        }
+        if (green2 > 6 && bTrigger == 0)
+        {
+            bCounter++;
+            if (bCounter > 2)
+            {
+            	b = i;
+            	bTrigger++;
+            }
+        }
+        else
+        {
+        	bCounter = 0;
+        }
+    }
+
+    uint16_t adjacent = 0, angle = 0;
+    if (a > b)
+    {
+        adjacent = a - b;
+        angle = 180 - ((atan2(10, adjacent) * 180) / 3.141592654);
+
+    }
+    else if (b > a)
+    {
+        adjacent = b - a;
+        angle = ((atan2(10, adjacent) * 180) / 3.141592654);
     }
     else
     {
-    	for (uint16_t j = width/4; j < height * width; j+= width) //check for positions of a and b to determine left/right steering
-    	{
-    		uint8_t blue1 = image[j] & 0x001F;
-    		uint8_t blue2 = image[j+width/2] & 0x001F;
-    		if (blue1 > 25 && aTrigger == 0)
-    		{
-    			a = j;
-    			aTrigger = 1;
-    		}
-    		if (blue2 > 25 && bTrigger == 0)
-    		{
-    			b = j;
-    			bTrigger = 1;
-    		}
-    		if (aTrigger == 1 && bTrigger == 1)
-    		{
-    			break;
-    		}
-    	}
-
-    	if (a < b)
-    	{
-    		//set TIM5->CCR1 duty cycle
-    		left();
-    	}
-    	else if (a > b)
-    	{
-    		//set TIM5->CCR1 duty cycle
-    		right();
-    	}
+    	angle = 1111;
     }
+
+    tft_prints(0, 0, "a = %d, b = %d\nangle = %d", a, b, angle);
 }
 
 /* USER CODE END 0 */
