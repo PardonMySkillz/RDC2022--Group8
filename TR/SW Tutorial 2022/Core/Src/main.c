@@ -25,62 +25,127 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-
+#include <math.h>
+#include <string.h>
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "lcd/lcd.h"
 /* USER CODE END Includes */
 
-/* Private typedef -----------------------------------------------------------*/
-/* USER CODE BEGIN PTD */
 
-/* USER CODE END PTD */
 
-/* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
-/* USER CODE END PD */
 
-/* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
 
-/* USER CODE END PM */
 
-/* Private variables ---------------------------------------------------------*/
 
-/* USER CODE BEGIN PV */
 
-/* USER CODE END PV */
+
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-/* USER CODE BEGIN PFP */
 
-/* USER CODE END PFP */
 
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
 
-/* USER CODE END 0 */
 
-/**
- * @brief  The application entry point.
- * @retval int
- */
+
+int conversion(int value)
+{
+    value -= 48;
+    return value;
+}
+
+void basic_movement(const char vector[10]) {                //up, down, left, right
+	int x = 0, y = 0, xDigits = 0, yDigits = 0, xNegative = 0, yNegative = 0, trigger = 0;
+		for (int i = 0; vector[i] != '\0'; i++) //get the digit count of each coordinate
+		{
+			if (trigger == 0) //search for x
+			{
+				if (vector[i] == '-')
+				{
+					xNegative = 1; //signal that x is a negative coordinate
+				}
+				else if (vector[i] == ',')
+				{
+					trigger = 1;
+				}
+				else
+				{
+					xDigits++;
+				}
+			}
+			else //search for y
+			{
+				if (vector[i] == '-')
+				{
+					yNegative = 1; //signal that y is a negative coordinate
+				}
+				else
+				{
+					yDigits++;
+				}
+			}
+		}
+		int valueTrigger = 0, xNegTrigger = 0, yNegTrigger = 0;
+			for (int i = 0; vector[i] != '\0'; i++)
+			{
+				if (valueTrigger == 0) //get value of x
+				{
+					if (xNegative == 1)
+					{
+						i++;
+						xNegative = 0;
+						xNegTrigger = 1;
+					}
+					if (vector[i] != ',')
+					{
+						x += conversion(vector[i]) * pow(10, xDigits - 1);
+						xDigits--;
+					}
+					else
+					{
+						valueTrigger = 1;
+					}
+				}
+				else
+				{
+					if (yNegative == 1)
+					{
+						i++;
+						yNegative = 0;
+						yNegTrigger = 1;
+
+					}
+					y += conversion(vector[i]) * pow(10, yDigits - 1);
+					yDigits--;
+				}
+			}
+
+			if (xNegTrigger == 1)
+			{
+				x = -x;
+			}
+			if (yNegTrigger == 1)
+			{
+				y = -y;
+			}
+			printf("x: %d \n", x);
+			printf("y: %d \n", y);
+
+			can_trigger_motor(x/cos(1.047),x/cos(1.047),y, 0);          //need more confirmation on this: ask HW + Mech team for more details.
+
+    }
+
+
+
+
+
 int main(void) {
     /* USER CODE BEGIN 1 */
+	can_init();
 
-    /* USER CODE END 1 */
-
-    /* MCU Configuration--------------------------------------------------------*/
-
-    /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
     HAL_Init();
 
-    /* USER CODE BEGIN Init */
 
-    /* USER CODE END Init */
-
-    /* Configure the system clock */
     SystemClock_Config();
 
     /* USER CODE BEGIN SysInit */
@@ -98,31 +163,26 @@ int main(void) {
     /* USER CODE BEGIN 2 */
     volatile uint32_t last_ticks = 0;
 
-    // we turn off all the led first
-    led_off(LED1);
-    led_off(LED2);
-    led_off(LED3);
-    led_off(LED4);
-    tft_init(PIN_ON_TOP, BLACK, WHITE, YELLOW, DARK_GREEN);
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_SET);
-
-    /* USER CODE END 2 */
-
-    /* Infinite loop */
-    /* USER CODE BEGIN WHILE */
+    can_init();
     tft_force_clear();
+
+
+
     while (1) {
-        if (HAL_GetTick() - last_ticks >= 100) {
-            tft_prints(0, 0, "Hello World!");
-            led_toggle(LED1);
-            led_toggle(LED2);
-            led_toggle(LED3);
-            led_toggle(LED4);
-            last_ticks = HAL_GetTick();
-        }
-        /* USER CODE END WHILE */
-        tft_update(100);
-        /* USER CODE BEGIN 3 */
+
+    	static char data[10];
+
+    	HAL_UART_Receive(huart1, *data,sizeof(data),0xFFFF);
+    	char coordinates_string[10] = "-123,-456";        //placeholder only, find way to receive data from uart
+
+
+
+
+
+
+
+
+
     }
     /* USER CODE END 3 */
 }
