@@ -151,7 +151,9 @@ void basic_movement(const char vector[10]) {                //up, down, left, ri
 			CAN_cmd_motor(speed1,speed2,speed3,0, &hcan1);
     }
 
-
+void rotation() {
+	CAN_cmd_motor(4000,4000,4000,0, &hcan1);
+}
 
 
 
