@@ -182,8 +182,8 @@ void steeringAlgorithm(uint16_t* image, uint16_t width, uint16_t height)
 
     for (uint16_t i = 1; i < width - 1; i++) //width
     {
-        uint16_t green1 = (*(image + width * (height - (height/7)) + i) & 0x07E0) >> 5;
-        uint16_t green2 = (*(image + width * (height - (height/9)) + i) & 0x07E0) >> 5;
+        uint16_t green1 = (*(image + width * ((height * 7)/10) + i) & 0x07E0) >> 5;
+        uint16_t green2 = (*(image + width * ((height * 9)/10) + i) & 0x07E0) >> 5;
         if (green1 > 6 && aTrigger == 0)
         {
             aCounter++;
@@ -216,13 +216,13 @@ void steeringAlgorithm(uint16_t* image, uint16_t width, uint16_t height)
     if (a > b)
     {
         adjacent = a - b;
-        angle = 180 - ((atan2(10, adjacent) * 180) / 3.141592654);
+        angle = 180 - ((atan2(32, adjacent) * 180) / 3.141592654);
 
     }
     else if (b > a)
     {
         adjacent = b - a;
-        angle = ((atan2(10, adjacent) * 180) / 3.141592654);
+        angle = ((atan2(32, adjacent) * 180) / 3.141592654);
     }
     else
     {
