@@ -7,19 +7,19 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
   1 .text         00009004  08000188  08000188  00010188  2**3
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .rodata       00000f78  08009190  08009190  00019190  2**3
+  2 .rodata       00000f90  08009190  08009190  00019190  2**3
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  3 .ARM.extab    00000000  0800a108  0800a108  00020114  2**0
+  3 .ARM.extab    00000000  0800a120  0800a120  00020114  2**0
                   CONTENTS
-  4 .ARM          00000008  0800a108  0800a108  0001a108  2**2
+  4 .ARM          00000008  0800a120  0800a120  0001a120  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  5 .preinit_array 00000000  0800a110  0800a110  00020114  2**0
+  5 .preinit_array 00000000  0800a128  0800a128  00020114  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  6 .init_array   00000004  0800a110  0800a110  0001a110  2**2
+  6 .init_array   00000004  0800a128  0800a128  0001a128  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  7 .fini_array   00000004  0800a114  0800a114  0001a114  2**2
+  7 .fini_array   00000004  0800a12c  0800a12c  0001a12c  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  8 .data         00000114  20000000  0800a118  00020000  2**2
+  8 .data         00000114  20000000  0800a130  00020000  2**2
                   CONTENTS, ALLOC, LOAD, DATA
   9 .ccmram       00000000  10000000  10000000  00020114  2**0
                   CONTENTS
@@ -29,23 +29,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  12 .ARM.attributes 00000030  00000000  00000000  00020114  2**0
                   CONTENTS, READONLY
- 13 .debug_info   000199c5  00000000  00000000  00020144  2**0
+ 13 .debug_info   00019981  00000000  00000000  00020144  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_abbrev 000038b6  00000000  00000000  00039b09  2**0
+ 14 .debug_abbrev 00003887  00000000  00000000  00039ac5  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_aranges 000015c0  00000000  00000000  0003d3c0  2**3
+ 15 .debug_aranges 000015c0  00000000  00000000  0003d350  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_ranges 00001488  00000000  00000000  0003e980  2**3
+ 16 .debug_ranges 00001470  00000000  00000000  0003e910  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_macro  00022a7f  00000000  00000000  0003fe08  2**0
+ 17 .debug_macro  00022a7f  00000000  00000000  0003fd80  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_line   0001b263  00000000  00000000  00062887  2**0
+ 18 .debug_line   0001b24b  00000000  00000000  000627ff  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_str    000cb20d  00000000  00000000  0007daea  2**0
+ 19 .debug_str    000cb21c  00000000  00000000  0007da4a  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .comment      00000050  00000000  00000000  00148cf7  2**0
+ 20 .comment      00000050  00000000  00000000  00148c66  2**0
                   CONTENTS, READONLY
- 21 .debug_frame  0000611c  00000000  00000000  00148d48  2**2
+ 21 .debug_frame  00006120  00000000  00000000  00148cb8  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -1568,7 +1568,7 @@ CameraState camera_init(void) {
  8001104:	bd80      	pop	{r7, pc}
  8001106:	bf00      	nop
  8001108:	2000009b 	.word	0x2000009b
- 800110c:	080091ec 	.word	0x080091ec
+ 800110c:	08009208 	.word	0x08009208
 
 08001110 <cam_set_state>:
 void cam_set_state(CameraState state) { cam_state = state; }
@@ -1809,7 +1809,7 @@ void cam_set_window(uint16_t off_x, uint16_t off_y, CamFrameSize size) {
  80012b2:	46bd      	mov	sp, r7
  80012b4:	bd80      	pop	{r7, pc}
  80012b6:	bf00      	nop
- 80012b8:	080091ec 	.word	0x080091ec
+ 80012b8:	08009208 	.word	0x08009208
  80012bc:	2000009b 	.word	0x2000009b
 
 080012c0 <cam_set_framerate>:
@@ -1858,7 +1858,7 @@ void cam_set_framerate(CamFrameRate rate) {
  8001306:	3708      	adds	r7, #8
  8001308:	46bd      	mov	sp, r7
  800130a:	bd80      	pop	{r7, pc}
- 800130c:	0800920c 	.word	0x0800920c
+ 800130c:	08009228 	.word	0x08009228
  8001310:	2000009c 	.word	0x2000009c
 
 08001314 <cam_set_lightmode>:
@@ -2488,7 +2488,7 @@ void cam_get_rgb565(uint16_t* image) {
  8001770:	40020400 	.word	0x40020400
  8001774:	40020800 	.word	0x40020800
  8001778:	2000009b 	.word	0x2000009b
- 800177c:	080091ec 	.word	0x080091ec
+ 800177c:	08009208 	.word	0x08009208
  8001780:	20000130 	.word	0x20000130
 
 08001784 <cam_rgb2printable>:
@@ -2557,7 +2557,7 @@ __STATIC_FORCEINLINE int16_t __REVSH(int16_t value)
  80017ec:	4770      	bx	lr
  80017ee:	bf00      	nop
  80017f0:	2000009b 	.word	0x2000009b
- 80017f4:	080091ec 	.word	0x080091ec
+ 80017f4:	08009208 	.word	0x08009208
 
 080017f8 <HAL_GPIO_EXTI_Callback>:
 #pragma GCC pop_options
@@ -5456,8 +5456,8 @@ void tft_init(TFT_ORIENTATION orientation, uint16_t bg_color,
  8002a54:	200001e6 	.word	0x200001e6
  8002a58:	40020000 	.word	0x40020000
  8002a5c:	40020400 	.word	0x40020400
- 8002a60:	0800a01c 	.word	0x0800a01c
- 8002a64:	0800a090 	.word	0x0800a090
+ 8002a60:	0800a038 	.word	0x0800a038
+ 8002a64:	0800a0ac 	.word	0x0800a0ac
  8002a68:	2000082a 	.word	0x2000082a
  8002a6c:	2000082b 	.word	0x2000082b
 
@@ -6784,7 +6784,7 @@ uint8_t tft_update(uint32_t period) {
  80033d4:	20005830 	.word	0x20005830
  80033d8:	200000a0 	.word	0x200000a0
  80033dc:	200001e5 	.word	0x200001e5
- 80033e0:	0800921c 	.word	0x0800921c
+ 80033e0:	08009238 	.word	0x08009238
  80033e4:	2000082c 	.word	0x2000082c
  80033e8:	20000830 	.word	0x20000830
  80033ec:	200001e6 	.word	0x200001e6
@@ -7235,10 +7235,10 @@ int main(void)
   	tft_update(0);
  8003766:	2000      	movs	r0, #0
  8003768:	f7ff fcec 	bl	8003144 <tft_update>
-  	cam_set_window(60, 0, QQVGA_120x160);
+  	cam_set_window(150, 0, QQVGA_120x160);
  800376c:	2203      	movs	r2, #3
  800376e:	2100      	movs	r1, #0
- 8003770:	203c      	movs	r0, #60	; 0x3c
+ 8003770:	2096      	movs	r0, #150	; 0x96
  8003772:	f7fd fcef 	bl	8001154 <cam_set_window>
 //  	cam_set_framesize(QQVGA_120x160);
   	cam_set_framerate(CAM_75FPS);
@@ -7416,10 +7416,10 @@ int main(void)
   		if (cam_is_frame_ready())
  80038d2:	e7d9      	b.n	8003888 <main+0x1dc>
  80038d4:	40020400 	.word	0x40020400
- 80038d8:	080091c0 	.word	0x080091c0
- 80038dc:	080091d0 	.word	0x080091d0
- 80038e0:	080091e4 	.word	0x080091e4
- 80038e4:	0800a094 	.word	0x0800a094
+ 80038d8:	080091dc 	.word	0x080091dc
+ 80038dc:	080091ec 	.word	0x080091ec
+ 80038e0:	08009200 	.word	0x08009200
+ 80038e4:	0800a0b0 	.word	0x0800a0b0
  80038e8:	40014400 	.word	0x40014400
  80038ec:	40014800 	.word	0x40014800
 
@@ -9101,9 +9101,9 @@ void MX_TIM11_Init(void)
  8004220:	4b1e      	ldr	r3, [pc, #120]	; (800429c <MX_TIM11_Init+0x94>)
  8004222:	4a1f      	ldr	r2, [pc, #124]	; (80042a0 <MX_TIM11_Init+0x98>)
  8004224:	601a      	str	r2, [r3, #0]
-  htim11.Init.Prescaler = 0;
+  htim11.Init.Prescaler = 84-1;
  8004226:	4b1d      	ldr	r3, [pc, #116]	; (800429c <MX_TIM11_Init+0x94>)
- 8004228:	2200      	movs	r2, #0
+ 8004228:	2253      	movs	r2, #83	; 0x53
  800422a:	605a      	str	r2, [r3, #4]
   htim11.Init.CounterMode = TIM_COUNTERMODE_UP;
  800422c:	4b1b      	ldr	r3, [pc, #108]	; (800429c <MX_TIM11_Init+0x94>)
@@ -9832,7 +9832,7 @@ LoopFillZerobss:
   ldr r1, =_edata
  800466c:	20000114 	.word	0x20000114
   ldr r2, =_sidata
- 8004670:	0800a118 	.word	0x0800a118
+ 8004670:	0800a130 	.word	0x0800a130
   ldr r2, =_sbss
  8004674:	20000114 	.word	0x20000114
   ldr r4, =_ebss
@@ -12031,7 +12031,7 @@ static uint32_t DMA_CalcBaseAndBitshift(DMA_HandleTypeDef *hdma)
  80051e8:	4770      	bx	lr
  80051ea:	bf00      	nop
  80051ec:	aaaaaaab 	.word	0xaaaaaaab
- 80051f0:	0800a0cc 	.word	0x0800a0cc
+ 80051f0:	0800a0e8 	.word	0x0800a0e8
 
 080051f4 <DMA_CheckFifoParam>:
   * @param  hdma       pointer to a DMA_HandleTypeDef structure that contains
@@ -14448,7 +14448,7 @@ HAL_StatusTypeDef HAL_RCC_ClockConfig(RCC_ClkInitTypeDef  *RCC_ClkInitStruct, ui
  8005fe6:	bf00      	nop
  8005fe8:	40023c00 	.word	0x40023c00
  8005fec:	40023800 	.word	0x40023800
- 8005ff0:	0800a0b4 	.word	0x0800a0b4
+ 8005ff0:	0800a0d0 	.word	0x0800a0d0
  8005ff4:	200000a4 	.word	0x200000a4
  8005ff8:	200000a8 	.word	0x200000a8
 
@@ -14750,7 +14750,7 @@ uint32_t HAL_RCC_GetPCLK1Freq(void)
  800623c:	4618      	mov	r0, r3
  800623e:	bd80      	pop	{r7, pc}
  8006240:	40023800 	.word	0x40023800
- 8006244:	0800a0c4 	.word	0x0800a0c4
+ 8006244:	0800a0e0 	.word	0x0800a0e0
 
 08006248 <HAL_RCC_GetPCLK2Freq>:
   * @note   Each time PCLK2 changes, this function must be called to update the
@@ -14776,7 +14776,7 @@ uint32_t HAL_RCC_GetPCLK2Freq(void)
  8006264:	4618      	mov	r0, r3
  8006266:	bd80      	pop	{r7, pc}
  8006268:	40023800 	.word	0x40023800
- 800626c:	0800a0c4 	.word	0x0800a0c4
+ 800626c:	0800a0e0 	.word	0x0800a0e0
 
 08006270 <HAL_SPI_Init>:
   * @param  hspi pointer to a SPI_HandleTypeDef structure that contains
@@ -20273,10 +20273,10 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
  80082be:	4798      	blx	r3
  80082c0:	3601      	adds	r6, #1
  80082c2:	e7f2      	b.n	80082aa <__libc_init_array+0x1e>
- 80082c4:	0800a110 	.word	0x0800a110
- 80082c8:	0800a110 	.word	0x0800a110
- 80082cc:	0800a110 	.word	0x0800a110
- 80082d0:	0800a114 	.word	0x0800a114
+ 80082c4:	0800a128 	.word	0x0800a128
+ 80082c8:	0800a128 	.word	0x0800a128
+ 80082cc:	0800a128 	.word	0x0800a128
+ 80082d0:	0800a12c 	.word	0x0800a12c
 
 080082d4 <memset>:
  80082d4:	4402      	add	r2, r0
@@ -21091,11 +21091,11 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
  8008b7c:	43400000 	.word	0x43400000
  8008b80:	0003988e 	.word	0x0003988e
  8008b84:	000bb679 	.word	0x000bb679
- 8008b88:	0800a0d8 	.word	0x0800a0d8
+ 8008b88:	0800a0f0 	.word	0x0800a0f0
  8008b8c:	3ff00000 	.word	0x3ff00000
  8008b90:	40080000 	.word	0x40080000
- 8008b94:	0800a0f8 	.word	0x0800a0f8
- 8008b98:	0800a0e8 	.word	0x0800a0e8
+ 8008b94:	0800a110 	.word	0x0800a110
+ 8008b98:	0800a100 	.word	0x0800a100
  8008b9c:	a3b5      	add	r3, pc, #724	; (adr r3, 8008e74 <__ieee754_pow+0xa54>)
  8008b9e:	e9d3 2300 	ldrd	r2, r3, [r3]
  8008ba2:	4640      	mov	r0, r8

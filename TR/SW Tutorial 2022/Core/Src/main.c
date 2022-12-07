@@ -131,11 +131,29 @@ void basic_movement(const char vector[10]) {                //up, down, left, ri
 			printf("x: %d \n", x);
 			printf("y: %d \n", y);
 
-			can_trigger_motor(x/cos(1.047),x/cos(1.047),y, 0);          //need more confirmation on this: ask HW + Mech team for more details.
+			//can_trigger_motor(x/cos(1.047),x/cos(1.047),y, 0);          //need more confirmation on this: ask HW + Mech team for more details.
 
+			uint16_t speed = 4000;
+
+			double joy_angle_rad = atan2(y,x);
+
+			double angle_wheel_1_rad = 1.57 ;
+			double angle_wheel_2_rad= 3.665 ;
+			double angle_wheel_3_rad= 5.7596 ; //90,210,330 deg (assume relative to head)
+
+			double theta_1_rad = angle_wheel_1_rad - joy_angle_rad;
+			double theta_2_rad = angle_wheel_2_rad - joy_angle_rad;
+			double theta_3_rad = angle_wheel_3_rad - joy_angle_rad;
+
+			uint16_t speed1 = speed*sin(theta_1_rad);
+			uint16_t speed2 = speed*sin(theta_2_rad);
+			uint16_t speed3 = speed*sin(theta_3_rad);
+			CAN_cmd_motor(speed1,speed2,speed3,0, &hcan1);
     }
 
-
+void rotation() {
+	CAN_cmd_motor(4000,4000,4000,0, &hcan1);
+}
 
 
 
@@ -169,10 +187,11 @@ int main(void) {
 
 
     while (1) {
-
+    	HAL_CAN_RxFifo0MsgPendingCallback(&hcan1);
+    	UpdateMotorStatus();
     	static char data[10];
 
-    	HAL_UART_Receive(huart1, *data,sizeof(data),0xFFFF);
+    	HAL_UART_Receive(&huart1, *data,sizeof(data),0xFFFF); //serial input, from joystick app
     	char coordinates_string[10] = "-123,-456";        //placeholder only, find way to receive data from uart
 
 
