@@ -149,10 +149,10 @@ void pwm_init(void) {
 	HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_1); //servoMotor
 	TIM5->ARR = 39999;
 	TIM5->PSC = 41;
-	TIM5->CCR1 = 2999;
+	TIM5->CCR1 = 3200;
 	HAL_TIM_PWM_Start(&htim10, TIM_CHANNEL_1); //leftMotor
-	TIM10->ARR = 839;
-	TIM10->PSC = 9;
+	TIM10->ARR = 39999;
+	TIM10->PSC = 41;
 	TIM10->CCR1 = 0;
 	HAL_TIM_PWM_Start(&htim11, TIM_CHANNEL_1); //rightMotor
 	TIM11->ARR = 839;

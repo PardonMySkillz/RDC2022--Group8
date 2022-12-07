@@ -1,9 +1,9 @@
-#include "lcd/lcd.h"
+#include "lcd.h"
 
 #include "dma.h"
-#include "lcd/lcd_font.h"
-#include "lcd/lcd_init.h"
-#include "lcd/strhelper.h"
+#include "lcd_font.h"
+#include "lcd_init.h"
+#include "strhelper.h"
 #include "main.h"
 
 /* GPIO configuration */
