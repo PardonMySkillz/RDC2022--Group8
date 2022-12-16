@@ -27,85 +27,34 @@
 #include "usart.h"
 #include "gpio.h"
 #include <math.h>
-
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
+#include <stdlib.h>
 #include "camera/camera.h"
 #include "lcd/lcd.h"
 #include "lcd/lcd_graphics.h"
-// #include "legacy/camera.h"
-/* USER CODE END Includes */
-
-/* Private typedef -----------------------------------------------------------*/
-/* USER CODE BEGIN PTD */
-
-/* USER CODE END PTD */
-
-/* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
-/* USER CODE END PD */
-
-/* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
-
-/* USER CODE END PM */
-
-/* Private variables ---------------------------------------------------------*/
-
-/* USER CODE BEGIN PV */
-
-/* USER CODE END PV */
-
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
-void medianFilter(uint16_t width, uint16_t height, uint16_t* originaldataPtr, uint16_t* processed_dataPtr) {
-    uint8_t window[9];
-
-    for (uint16_t x=1; x<width-1; x++) {
-        for (uint16_t y=1; y<height-1; y++) {
-            uint8_t k = 0;
-            for (int u=x-1; u<=x+1;u++) {
-                for (int v=y-1; v<=y+1; v++) {
-                    window[k++] = *(originaldataPtr + width*v+u);
-                }
-            }
-            for (uint8_t i=0; i<5; i++) {
-                for (uint8_t j=i+1; j<9; j++) {
-                    if (window[j] < window[i]) {
-                        uint8_t temp = window[i];
-                        window[i] = window[j];
-                        window[j] = temp;
-                    }
-                }
-            }
-            *(processed_dataPtr  + width*y+x) = window[4];
-        }
-    }
-}
-
-void grayscale(uint16_t width, uint16_t height, uint16_t* originalPTR, uint16_t* processed_dataPtr)
+void blackFilter(uint16_t width, uint16_t height, uint16_t* originalPTR, uint16_t* processedPTR)
 {
-	for (uint16_t x = 0; x < width; x++) //width
+	for (uint16_t x=0; x<width; x++)
 	{
-		for (uint16_t y = 0; y < height; y++) //height
+		for (uint16_t y =0; y<height; y++)
 		{
-			int16_t pixel = *(originalPTR + width * y + x);
-			uint16_t red = ((pixel & 0xF800) >> 11);
-			uint16_t green = ((pixel & 0x07E0) >> 5);
-			uint16_t blue = (pixel & 0x001F);
-
-			uint16_t magnitude = ((red*2)+green+(blue*2))/3;
-			*(processed_dataPtr + width * y + x) = ((magnitude/2 | *(processed_dataPtr + width * y + x)) << 6); // red
-			*(processed_dataPtr + width * y + x) = ((magnitude | *(processed_dataPtr + width * y + x)) << 5); // green
-			*(processed_dataPtr + width * y + x) = magnitude/2 | *(processed_dataPtr + width * y + x); // blue
+			uint16_t pixel = *(originalPTR + width*y + x) & 0x001F;
+			if (pixel > 11)
+			{
+				*(processedPTR + width*y + x) = *(processedPTR + width*y + x) | 0xFFFF;
+			}
+			else
+			{
+				*(processedPTR + width*y + x) = *(processedPTR + width*y + x) & 0x0000;
+			}
 		}
 	}
 }
 
-void sobelFilter(uint16_t width, uint16_t height, uint16_t* originalPTR, uint16_t* processed_dataPtr) {
-    int16_t window[9]; //set an array to store values of 3x3 matrix
+void sobelFilter(uint16_t width, uint16_t height, uint16_t* originalPTR, uint16_t* processed_dataPtr){
+	int16_t window[9]; //set an array to store values of 3x3 matrix
     int16_t gx[] = {1,0,-1,2,0,-2,1,0,-1};
     int16_t gy[] = {1,2,1,0,0,0,-1,-2,-1};
 
@@ -132,7 +81,15 @@ void sobelFilter(uint16_t width, uint16_t height, uint16_t* originalPTR, uint16_
                 sumX += blue*gx[i];
                 sumY += blue*gy[i];
             }
-            uint16_t magnitudeBlue = sqrt(pow(sumX, 2) + pow(sumY, 2))/6;
+            uint16_t magnitudeBlue = sqrt(pow(sumX, 2) + pow(sumY, 2));
+            if (magnitudeBlue < 12)
+            {
+            	magnitudeBlue = 0;
+            }
+            else
+            {
+            	magnitudeBlue = 31;
+            }
 
             uint16_t temporary =  ((((magnitudeBlue * 2)+1) | (magnitudeBlue << 6)) << 5) | magnitudeBlue;
             //uint16_t temporary = ((magnitudeBlue | temporary) << 6); // red
@@ -149,10 +106,10 @@ void pwm_init(void) {
 	HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_1); //servoMotor
 	TIM5->ARR = 39999;
 	TIM5->PSC = 41;
-	TIM5->CCR1 = 3200;
+	TIM5->CCR1 = 2999;
 	HAL_TIM_PWM_Start(&htim10, TIM_CHANNEL_1); //leftMotor
-	TIM10->ARR = 39999;
-	TIM10->PSC = 41;
+	TIM10->ARR = 839;
+	TIM10->PSC = 9;
 	TIM10->CCR1 = 0;
 	HAL_TIM_PWM_Start(&htim11, TIM_CHANNEL_1); //rightMotor
 	TIM11->ARR = 839;
@@ -160,76 +117,53 @@ void pwm_init(void) {
 	TIM11->CCR1 = 0;
 }
 /* USER CODE END PFP */
-
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 void forward()
 {
-	gpio_reset(IN1);
-	gpio_set(IN2);
+	gpio_set(IN1);
+	gpio_reset(IN2);
 	gpio_reset(IN3);
 	gpio_set(IN4);
 }
 
 void steeringAlgorithm(uint16_t* image, uint16_t width, uint16_t height)
 {
-    uint16_t a = 0;
-    uint16_t b = 0;
-    uint8_t aCounter = 0;
-    uint8_t bCounter = 0;
-    uint8_t aTrigger = 0;
-    uint8_t bTrigger = 0;
+	uint16_t left = 0;
+	uint16_t right = 0;
+	for (uint16_t y = 0; y<height/4-1; y++)
+	{
+		for (uint16_t x = 0; x<width/2-1; x++) // Calculate Left Rectangle
+		{
+			if (*(image + width*y + x) == 0xFFFF)
+			{
+				right++;
+			}
+		}
+		for (uint16_t x = width/2-1;x<width-1;x++) // Calculate Right Rectangle
+		{
+			if (*(image + width*y + x) == 0xFFFF)
+			{
+				left++;
+			}
+		}
+	}
 
-    for (uint16_t i = 1; i < width - 1; i++) //width
-    {
-        uint16_t green1 = (*(image + width * ((height * 7)/10) + i) & 0x07E0) >> 5;
-        uint16_t green2 = (*(image + width * ((height * 9)/10) + i) & 0x07E0) >> 5;
-        if (green1 > 6 && aTrigger == 0)
-        {
-            aCounter++;
-            if (aCounter > 2)
-            {
-            	a = i;
-            	aTrigger++;
-            }
-        }
-        else
-        {
-        	aCounter = 0;
-        }
-        if (green2 > 6 && bTrigger == 0)
-        {
-            bCounter++;
-            if (bCounter > 2)
-            {
-            	b = i;
-            	bTrigger++;
-            }
-        }
-        else
-        {
-        	bCounter = 0;
-        }
-    }
-
-    uint16_t adjacent = 0, angle = 0;
-    if (a > b)
-    {
-        adjacent = a - b;
-        angle = 180 - ((atan2(32, adjacent) * 180) / 3.141592654);
-
-    }
-    else if (b > a)
-    {
-        adjacent = b - a;
-        angle = ((atan2(32, adjacent) * 180) / 3.141592654);
-    }
-    else
-    {
-    	angle = 1111;
-    }
-
-    tft_prints(0, 0, "a = %d, b = %d\nangle = %d", a, b, angle);
+	if (abs(left-right) >= 250) //find difference of number of pixels between left and right
+	{
+		if (left > right)
+		{
+			TIM5->CCR1 = 1680;
+		}
+		else
+		{
+			TIM5->CCR1 = 4200;
+		}
+	}
+	else
+	{
+		TIM5->CCR1 = 3200;
+	}
 }
 
 /* USER CODE END 0 */
@@ -290,7 +224,8 @@ int main(void)
   		cam_set_state(CAM_CAPTURING);
   	}
   	tft_update(0);
-  	cam_set_window(150, 0, QQVGA_120x160);
+  	cam_set_window(70, 0, QQVGA_120x160);
+  	cam_set_zoomscale(0);
 //  	cam_set_framesize(QQVGA_120x160);
   	cam_set_framerate(CAM_75FPS);
   	cam_set_colormode(CAM_GRAYSCALE);
@@ -315,24 +250,28 @@ int main(void)
 
   	while (1)
   	{
+  		static uint16_t last_ticks = 0;
   		if (cam_is_frame_ready())
   		{
   			//Get image from camera
   			cam_get_rgb565(image);
   			//Commence SobelOperation:
-  			sobelFilter(WIDTH, HEIGHT, image, processed);
-
+  			if (HAL_GetTick() - last_ticks >= 100)
+			{
+  				blackFilter(WIDTH, HEIGHT, image, processed);
+				led_toggle(LED1);
+				last_ticks = HAL_GetTick();
+			}
+  			steeringAlgorithm(processed, WIDTH, HEIGHT);
+  			tft_update(0);
   			cam_rgb2printable(processed, image);
   			//Print Image
   			tft_print_image(image,0,0,WIDTH,HEIGHT);
-
   		}
   		//Motors
-
-  		TIM10->CCR1 = 839;
-  		TIM11->CCR1 = 839;
-  		//forward();
-
+		TIM10->CCR1 = 620;
+		TIM11->CCR1 = 620;
+		//forward();
   	}
   /* USER CODE END 2 */
 }
