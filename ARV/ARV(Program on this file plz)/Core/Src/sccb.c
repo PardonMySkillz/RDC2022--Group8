@@ -1,4 +1,4 @@
-#include "sccb.h"
+#include "camera/sccb.h"
 
 #include "tim.h"
 

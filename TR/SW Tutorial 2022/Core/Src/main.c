@@ -44,9 +44,45 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 
+void forward()
+{
 
+}
 
+void left()
+{
 
+}
+
+void right()
+{
+
+}
+
+void backward()
+{
+
+}
+
+void stop()
+{
+
+}
+
+void rotateL()
+{
+
+}
+
+void rotateR()
+{
+
+}
+
+void kick()
+{
+
+}
 
 int conversion(int value)
 {
@@ -54,102 +90,123 @@ int conversion(int value)
     return value;
 }
 
-void basic_movement(const char vector[10]) {                //up, down, left, right
-	int x = 0, y = 0, xDigits = 0, yDigits = 0, xNegative = 0, yNegative = 0, trigger = 0;
-		for (int i = 0; vector[i] != '\0'; i++) //get the digit count of each coordinate
-		{
-			if (trigger == 0) //search for x
-			{
-				if (vector[i] == '-')
-				{
-					xNegative = 1; //signal that x is a negative coordinate
-				}
-				else if (vector[i] == ',')
-				{
-					trigger = 1;
-				}
-				else
-				{
-					xDigits++;
-				}
-			}
-			else //search for y
-			{
-				if (vector[i] == '-')
-				{
-					yNegative = 1; //signal that y is a negative coordinate
-				}
-				else
-				{
-					yDigits++;
-				}
-			}
-		}
-		int valueTrigger = 0, xNegTrigger = 0, yNegTrigger = 0;
-			for (int i = 0; vector[i] != '\0'; i++)
-			{
-				if (valueTrigger == 0) //get value of x
-				{
-					if (xNegative == 1)
-					{
-						i++;
-						xNegative = 0;
-						xNegTrigger = 1;
-					}
-					if (vector[i] != ',')
-					{
-						x += conversion(vector[i]) * pow(10, xDigits - 1);
-						xDigits--;
-					}
-					else
-					{
-						valueTrigger = 1;
-					}
-				}
-				else
-				{
-					if (yNegative == 1)
-					{
-						i++;
-						yNegative = 0;
-						yNegTrigger = 1;
-
-					}
-					y += conversion(vector[i]) * pow(10, yDigits - 1);
-					yDigits--;
-				}
-			}
-
-			if (xNegTrigger == 1)
-			{
-				x = -x;
-			}
-			if (yNegTrigger == 1)
-			{
-				y = -y;
-			}
-			printf("x: %d \n", x);
-			printf("y: %d \n", y);
-
-			//can_trigger_motor(x/cos(1.047),x/cos(1.047),y, 0);          //need more confirmation on this: ask HW + Mech team for more details.
-
-			uint16_t speed = 4000;
-
-			double joy_angle_rad = atan2(y,x);
-
-			double angle_wheel_1_rad = 1.57 ;
-			double angle_wheel_2_rad= 3.665 ;
-			double angle_wheel_3_rad= 5.7596 ; //90,210,330 deg (assume relative to head)
-
-			double theta_1_rad = angle_wheel_1_rad - joy_angle_rad;
-			double theta_2_rad = angle_wheel_2_rad - joy_angle_rad;
-			double theta_3_rad = angle_wheel_3_rad - joy_angle_rad;
-
-			uint16_t speed1 = speed*sin(theta_1_rad);
-			uint16_t speed2 = speed*sin(theta_2_rad);
-			uint16_t speed3 = speed*sin(theta_3_rad);
-			CAN_cmd_motor(speed1,speed2,speed3,0, &hcan1);
+void movement(char* coordinates)
+{
+	static	int xValue = 0, yValue = 0;
+    int x = 0, y = 0, xDigits = 0, yDigits = 0, xNegative = 0, yNegative = 0, trigger = 0;
+    for (int i = 1; coordinates[i] != '\0'; i++) //get the digit count of each coordinate
+    {
+        if (trigger == 0) //search for x
+        {
+            if (coordinates[i] == '-')
+            {
+                xNegative = 1; //signal that x is a negative coordinate
+            }
+            else if (coordinates[i] == ',')
+            {
+                trigger = 1;
+            }
+            else
+            {
+                xDigits++;
+            }
+        }
+        else //search for y
+        {
+            if (coordinates[i] == '-')
+            {
+                yNegative = 1; //signal that y is a negative coordinate
+            }
+            else
+            {
+                yDigits++;
+            }
+        }
     }
+
+    int valueTrigger = 0, xNegTrigger = 0, yNegTrigger = 0;
+    for (int i = 1; coordinates[i] != '\0'; i++)
+    {
+        if (valueTrigger == 0) //get value of x
+        {
+            if (xNegative == 1)
+            {
+                i++;
+                xNegative = 0;
+                xNegTrigger = 1;
+            }
+            if (coordinates[i] != ',')
+            {
+                x += conversion(coordinates[i]) * pow(10, xDigits - 1);
+                xDigits--;
+            }
+            else
+            {
+                valueTrigger = 1;
+            }
+        }
+        else
+        {
+            if (yNegative == 1)
+            {
+                i++;
+                yNegative = 0;
+                yNegTrigger = 1;
+
+            }
+            y += conversion(coordinates[i]) * pow(10, yDigits - 1);
+            yDigits--;
+        }
+    }
+
+    if (xNegTrigger == 1)
+    {
+        x = -x;
+    }
+    if (yNegTrigger == 1)
+    {
+        y = -y;
+    }
+
+    xValue = x;
+    yValue = y;
+    tft_prints(0, 0, "x=%d, y=%d", xValue, yValue);
+
+
+//    			if ( (xValue < 30 && xValue >-30)|| (yValue <30 && yValue >-30) ){
+//    				return;
+//    			}
+//    			double joy_angle_rad = atan2(yValue,xValue);
+//
+//
+//    			tft_update(10);
+//
+//    			if ( (xValue < 30 && xValue >-30)|| (yValue <30 && yValue >-30) ){
+//    				return;
+//    			}
+//
+//    			double angle_wheel_1_rad = 1.57 ;
+//    			double angle_wheel_2_rad= 3.665 ;
+//    			double angle_wheel_3_rad= 5.7596 ; //90,210,330 deg (assume relative to head)
+//
+//    			double theta_1_rad = angle_wheel_1_rad - joy_angle_rad;
+//    			double theta_2_rad = angle_wheel_2_rad - joy_angle_rad;
+//    			double theta_3_rad = angle_wheel_3_rad - joy_angle_rad;
+//
+//    			int16_t speed1 = speed*sin(theta_1_rad);
+//    			int16_t speed2 = speed*sin(theta_2_rad);
+//    			int16_t speed3 = speed*sin(theta_3_rad);
+//
+//    			tft_prints(0,10, "ANGLE: %f", joy_angle_rad);
+//				tft_prints(0,2,"speed1: %d", speed1);
+//				tft_prints(0,4,"speed2: %d", speed2);
+//				tft_prints(0,6, "speed3: %d", speed3);
+//				tft_update(0);
+//    			CAN_cmd_motor(speed1,speed2,speed3,0, &hcan1);
+//}
+}
+
+
 
 void rotation() {
 	CAN_cmd_motor(4000,4000,4000,0, &hcan1);
@@ -159,10 +216,8 @@ void rotation() {
 
 int main(void) {
     /* USER CODE BEGIN 1 */
-	can_init();
 
-    HAL_Init();
-
+	HAL_Init();
 
     SystemClock_Config();
 
@@ -179,28 +234,56 @@ int main(void) {
     MX_USART2_UART_Init();
     MX_TIM5_Init();
     /* USER CODE BEGIN 2 */
-    volatile uint32_t last_ticks = 0;
 
-    can_init();
+
+    tft_init(PIN_ON_BOTTOM, BLACK, WHITE, YELLOW, DARK_GREEN);
     tft_force_clear();
 
-
-
+    can_init();
     while (1) {
+    	static uint64_t last_ticks = 0;
+    	static uint16_t motorSpeedLeft = 0;
+    	static uint16_t motorSpeedRight = 0;
+    	static uint16_t motorSpeedBack = 0;
     	HAL_CAN_RxFifo0MsgPendingCallback(&hcan1);
     	UpdateMotorStatus();
-    	static char data[10];
 
-    	HAL_UART_Receive(&huart1, *data,sizeof(data),0xFFFF); //serial input, from joystick app
-    	char coordinates_string[10] = "-123,-456";        //placeholder only, find way to receive data from uart
+    	static char data[1];
 
+		HAL_UART_Receive(&huart1, (uint8_t*)&data ,sizeof(data),0xFFFF); //serial input, from coolterm
 
+    	tft_prints(0, 0, "%s", data);
+		tft_update(0);
 
-
-
-
-
-
+		switch(data[0])
+		{
+			case '0': //stop
+				motorSpeedLeft = 0; motorSpeedRight = 0; motorSpeedBack = 0;
+				break;
+			case '1': //forward
+				motorSpeedLeft = 4000; motorSpeedRight = -4000; motorSpeedBack = 0;
+				break;
+			case '2': //backward
+				motorSpeedLeft = -4000; motorSpeedRight = 4000; motorSpeedBack = 0;
+				break;
+			case '3': //left
+				motorSpeedLeft = 2000; motorSpeedRight = -2000; motorSpeedBack = 3000;
+				break;
+			case '4': //right
+				motorSpeedLeft = -2000; motorSpeedRight = 2000; motorSpeedBack = -3000;
+				break;
+			case '5': //rotate left
+				motorSpeedLeft = 2000; motorSpeedRight = 2000; motorSpeedBack = 2000;
+				break;
+			case '6': //rotate right
+				motorSpeedLeft = -2000; motorSpeedRight = -2000; motorSpeedBack = -2000;
+				break;
+			case '7': //stop
+				motorSpeedLeft = 0; motorSpeedRight = 0; motorSpeedBack = 0;
+				//kicking function
+				break;
+		}
+		CAN_cmd_motor(motorSpeedLeft,motorSpeedRight,motorSpeedBack,0, &hcan1);
 
     }
     /* USER CODE END 3 */
