@@ -31,188 +31,14 @@
 /* USER CODE BEGIN Includes */
 #include "lcd/lcd.h"
 /* USER CODE END Includes */
-
-
-
-
-
-
-
-
-
-
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 
-void forward()
+
+void shoot()
 {
 
 }
-
-void left()
-{
-
-}
-
-void right()
-{
-
-}
-
-void backward()
-{
-
-}
-
-void stop()
-{
-
-}
-
-void rotateL()
-{
-
-}
-
-void rotateR()
-{
-
-}
-
-void kick()
-{
-
-}
-
-int conversion(int value)
-{
-    value -= 48;
-    return value;
-}
-
-void movement(char* coordinates)
-{
-	static	int xValue = 0, yValue = 0;
-    int x = 0, y = 0, xDigits = 0, yDigits = 0, xNegative = 0, yNegative = 0, trigger = 0;
-    for (int i = 1; coordinates[i] != '\0'; i++) //get the digit count of each coordinate
-    {
-        if (trigger == 0) //search for x
-        {
-            if (coordinates[i] == '-')
-            {
-                xNegative = 1; //signal that x is a negative coordinate
-            }
-            else if (coordinates[i] == ',')
-            {
-                trigger = 1;
-            }
-            else
-            {
-                xDigits++;
-            }
-        }
-        else //search for y
-        {
-            if (coordinates[i] == '-')
-            {
-                yNegative = 1; //signal that y is a negative coordinate
-            }
-            else
-            {
-                yDigits++;
-            }
-        }
-    }
-
-    int valueTrigger = 0, xNegTrigger = 0, yNegTrigger = 0;
-    for (int i = 1; coordinates[i] != '\0'; i++)
-    {
-        if (valueTrigger == 0) //get value of x
-        {
-            if (xNegative == 1)
-            {
-                i++;
-                xNegative = 0;
-                xNegTrigger = 1;
-            }
-            if (coordinates[i] != ',')
-            {
-                x += conversion(coordinates[i]) * pow(10, xDigits - 1);
-                xDigits--;
-            }
-            else
-            {
-                valueTrigger = 1;
-            }
-        }
-        else
-        {
-            if (yNegative == 1)
-            {
-                i++;
-                yNegative = 0;
-                yNegTrigger = 1;
-
-            }
-            y += conversion(coordinates[i]) * pow(10, yDigits - 1);
-            yDigits--;
-        }
-    }
-
-    if (xNegTrigger == 1)
-    {
-        x = -x;
-    }
-    if (yNegTrigger == 1)
-    {
-        y = -y;
-    }
-
-    xValue = x;
-    yValue = y;
-    tft_prints(0, 0, "x=%d, y=%d", xValue, yValue);
-
-
-//    			if ( (xValue < 30 && xValue >-30)|| (yValue <30 && yValue >-30) ){
-//    				return;
-//    			}
-//    			double joy_angle_rad = atan2(yValue,xValue);
-//
-//
-//    			tft_update(10);
-//
-//    			if ( (xValue < 30 && xValue >-30)|| (yValue <30 && yValue >-30) ){
-//    				return;
-//    			}
-//
-//    			double angle_wheel_1_rad = 1.57 ;
-//    			double angle_wheel_2_rad= 3.665 ;
-//    			double angle_wheel_3_rad= 5.7596 ; //90,210,330 deg (assume relative to head)
-//
-//    			double theta_1_rad = angle_wheel_1_rad - joy_angle_rad;
-//    			double theta_2_rad = angle_wheel_2_rad - joy_angle_rad;
-//    			double theta_3_rad = angle_wheel_3_rad - joy_angle_rad;
-//
-//    			int16_t speed1 = speed*sin(theta_1_rad);
-//    			int16_t speed2 = speed*sin(theta_2_rad);
-//    			int16_t speed3 = speed*sin(theta_3_rad);
-//
-//    			tft_prints(0,10, "ANGLE: %f", joy_angle_rad);
-//				tft_prints(0,2,"speed1: %d", speed1);
-//				tft_prints(0,4,"speed2: %d", speed2);
-//				tft_prints(0,6, "speed3: %d", speed3);
-//				tft_update(0);
-//    			CAN_cmd_motor(speed1,speed2,speed3,0, &hcan1);
-//}
-}
-
-
-
-void rotation() {
-	CAN_cmd_motor(4000,4000,4000,0, &hcan1);
-}
-
-
 
 int main(void) {
     /* USER CODE BEGIN 1 */
@@ -240,11 +66,20 @@ int main(void) {
     tft_force_clear();
 
     can_init();
-    while (1) {
+    while (1)
+    {
     	static uint64_t last_ticks = 0;
     	static uint16_t motorSpeedLeft = 0;
     	static uint16_t motorSpeedRight = 0;
     	static uint16_t motorSpeedBack = 0;
+
+    	static uint8_t prevState = 0;
+    	static uint8_t autoState = 1;
+
+    	static uint8_t dropper1 = 0;
+    	static uint8_t dropper2 = 0;
+    	static uint8_t dropper3 = 0;
+
     	HAL_CAN_RxFifo0MsgPendingCallback(&hcan1);
     	UpdateMotorStatus();
 
@@ -255,36 +90,126 @@ int main(void) {
     	tft_prints(0, 0, "%s", data);
 		tft_update(0);
 
-		switch(data[0])
+		if (data[0] == 'M') // Manual Mode
 		{
-			case '0': //stop
-				motorSpeedLeft = 0; motorSpeedRight = 0; motorSpeedBack = 0;
-				break;
-			case '1': //forward
-				motorSpeedLeft = 4000; motorSpeedRight = -4000; motorSpeedBack = 0;
-				break;
-			case '2': //backward
-				motorSpeedLeft = -4000; motorSpeedRight = 4000; motorSpeedBack = 0;
-				break;
-			case '3': //left
-				motorSpeedLeft = 2000; motorSpeedRight = -2000; motorSpeedBack = 3000;
-				break;
-			case '4': //right
-				motorSpeedLeft = -2000; motorSpeedRight = 2000; motorSpeedBack = -3000;
-				break;
-			case '5': //rotate left
-				motorSpeedLeft = 2000; motorSpeedRight = 2000; motorSpeedBack = 2000;
-				break;
-			case '6': //rotate right
-				motorSpeedLeft = -2000; motorSpeedRight = -2000; motorSpeedBack = -2000;
-				break;
-			case '7': //stop
-				motorSpeedLeft = 0; motorSpeedRight = 0; motorSpeedBack = 0;
-				//kicking function
-				break;
+			prevState = 0;
+		}
+		else if (data[0] == 'A') // Auto Mode
+		{
+			prevState = 1;
+		}
+
+		if (prevState == 0) //Manual Mode
+		{
+			switch(data[0])
+			{
+				case '0': //stop
+					motorSpeedLeft = 0; motorSpeedRight = 0; motorSpeedBack = 0;
+					break;
+				case '1': //forward
+					motorSpeedLeft = -4000; motorSpeedRight = 4000; motorSpeedBack = 0;
+					break;
+				case '2': //backward
+					motorSpeedLeft = 4000; motorSpeedRight = -4000; motorSpeedBack = 0;
+					break;
+				case '3': //left
+					motorSpeedLeft = -2000; motorSpeedRight = 2000; motorSpeedBack = -3000;
+					break;
+				case '4': //right
+					motorSpeedLeft = 2000; motorSpeedRight = -2000; motorSpeedBack = 3000;
+					break;
+				case '5': //rotate left
+					motorSpeedLeft = -2000; motorSpeedRight = -2000; motorSpeedBack = -2000;
+					break;
+				case '6': //rotate right
+					motorSpeedLeft = 2000; motorSpeedRight = 2000; motorSpeedBack = 2000;
+					break;
+				case '7': //Clamp and First Dropper Lock
+					if (dropper1 == 0)
+					{
+						dropper1 = 1;
+					}
+					else
+					{
+						dropper1 = 0;
+					}
+					break;
+				case '8': //Lifter and Second Dropper Lock
+					if (dropper2 == 0)
+					{
+						dropper2 = 1;
+					}
+					else
+					{
+						dropper2 = 0;
+					}
+					break;
+				case '9': // Third Dropper Lock
+					if (dropper3 == 0)
+					{
+						dropper3 = 1;
+					}
+					else
+					{
+						dropper3 = 0;
+					}
+					break;
+			}
+
+			if (dropper1 == 0)
+			{
+
+			}
+			else if (dropper1 == 1)
+			{
+
+			}
+
+			if (dropper2 == 0)
+			{
+
+			}
+			else if (dropper2 == 1)
+			{
+
+			}
+
+			if (dropper3 == 0)
+			{
+
+			}
+			else if (dropper3 == 1)
+			{
+
+			}
+
+		}
+		else if (prevState == 1) //Automatic Mode
+		{
+			if (HAL_GetTick() - last_ticks >= 5000)
+			{
+				if (autoState == 0)
+				{
+					autoState = 1;
+				}
+				else
+				{
+					autoState = 0;
+				}
+				last_ticks = HAL_GetTick() + 5000;
+			}
+
+			switch(autoState)
+			{
+				case 1:	//Forward
+					motorSpeedLeft = -4000; motorSpeedRight = 4000; motorSpeedBack = 0;
+					break;
+				case 0:	//Left
+					motorSpeedLeft = -2000; motorSpeedRight = 2000; motorSpeedBack = -3000;
+					break;
+			}
 		}
 		CAN_cmd_motor(motorSpeedLeft,motorSpeedRight,motorSpeedBack,0, &hcan1);
-
     }
     /* USER CODE END 3 */
 }
