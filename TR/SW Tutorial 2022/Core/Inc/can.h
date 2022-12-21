@@ -70,6 +70,7 @@ typedef struct{
 #define MOTOR_ID            2
 extern motor_status motor1_stat,motor2_stat,motor3_stat,motor4_stat;
 /* USER CODE END Private defines */
+
 void MX_CAN1_Init(void);
 void MX_CAN2_Init(void);
 
@@ -92,3 +93,4 @@ void  UpdateMotorStatus();
 #endif
 
 #endif /* __CAN_H__ */
+

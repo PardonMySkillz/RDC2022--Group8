@@ -73,12 +73,15 @@ int main(void) {
     	static uint16_t motorSpeedRight = 0;
     	static uint16_t motorSpeedBack = 0;
 
-    	static uint8_t prevState = 0;
+    	static uint8_t trState = 0;
     	static uint8_t autoState = 1;
+    	static char prevInput = '0';
 
     	static uint8_t dropper1 = 0;
     	static uint8_t dropper2 = 0;
     	static uint8_t dropper3 = 0;
+
+    	static uint8_t manualEnable = 0;
 
     	HAL_CAN_RxFifo0MsgPendingCallback(&hcan1);
     	UpdateMotorStatus();
@@ -87,19 +90,36 @@ int main(void) {
 
 		HAL_UART_Receive(&huart1, (uint8_t*)&data ,sizeof(data),0xFFFF); //serial input, from coolterm
 
-    	tft_prints(0, 0, "%s", data);
+    	tft_prints(0, 0, "%s, %d, %d, %d", data, dropper1, dropper2, dropper3);
 		tft_update(0);
 
-		if (data[0] == 'M') // Manual Mode
+		if (HAL_GetTick() - last_ticks >= 2000)
 		{
-			prevState = 0;
-		}
-		else if (data[0] == 'A') // Auto Mode
-		{
-			prevState = 1;
+			if (data[0] == 'M')
+			{
+				if (manualEnable == 1)
+				{
+					manualEnable = 0;
+				}
+				else if (manualEnable == 0)
+				{
+					manualEnable = 1;
+				}
+
+				last_ticks = HAL_GetTick() + 2000;
+			}
 		}
 
-		if (prevState == 0) //Manual Mode
+		if (manualEnable == 0)
+		{
+			trState = 0;
+		}
+		else if (manualEnable == 1)
+		{
+			trState = 1;
+		}
+
+		if (trState == 0) //Manual Mode
 		{
 			switch(data[0])
 			{
@@ -158,33 +178,33 @@ int main(void) {
 
 			if (dropper1 == 0)
 			{
-
+				gpio_set(valve1);
 			}
 			else if (dropper1 == 1)
 			{
-
+				gpio_reset(valve1);
 			}
 
 			if (dropper2 == 0)
 			{
-
+				gpio_set(valve2);
 			}
 			else if (dropper2 == 1)
 			{
-
+				gpio_reset(valve2);
 			}
 
 			if (dropper3 == 0)
 			{
-
+				gpio_set(valve3);
 			}
 			else if (dropper3 == 1)
 			{
-
+				gpio_set(valve3);
 			}
 
 		}
-		else if (prevState == 1) //Automatic Mode
+		else if (trState == 1) //Automatic Mode
 		{
 			if (HAL_GetTick() - last_ticks >= 5000)
 			{
@@ -209,7 +229,8 @@ int main(void) {
 					break;
 			}
 		}
-		CAN_cmd_motor(motorSpeedLeft,motorSpeedRight,motorSpeedBack,0, &hcan1);
+		CAN_cmd_motor(motorSpeedLeft/2,motorSpeedRight/2,motorSpeedBack/2,0, &hcan1);
+		prevInput = data[0];
     }
     /* USER CODE END 3 */
 }

@@ -59,6 +59,12 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define CAM_D7_Pin GPIO_PIN_13
 #define CAM_D7_GPIO_Port GPIOC
+#define valve1_Pin GPIO_PIN_15
+#define valve1_GPIO_Port GPIOC
+#define valve2_Pin GPIO_PIN_0
+#define valve2_GPIO_Port GPIOC
+#define valve3_Pin GPIO_PIN_1
+#define valve3_GPIO_Port GPIOC
 #define PWM1_Pin GPIO_PIN_0
 #define PWM1_GPIO_Port GPIOA
 #define CAM_HREF_Pin GPIO_PIN_1
