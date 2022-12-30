@@ -68,10 +68,10 @@ int main(void) {
     can_init();
     while (1)
     {
-    	static uint64_t last_ticks = 0;
-    	static uint16_t motorSpeedLeft = 0;
-    	static uint16_t motorSpeedRight = 0;
-    	static uint16_t motorSpeedBack = 0;
+    	static int64_t last_ticks = 0;
+    	static int16_t motorSpeedLeft = 0;
+    	static int16_t motorSpeedRight = 0;
+    	static int16_t motorSpeedBack = 0;
 
     	static uint8_t trState = 0;
     	static uint8_t autoState = 1;
@@ -88,9 +88,10 @@ int main(void) {
 
     	static char data[1];
 
-		HAL_UART_Receive(&huart1, (uint8_t*)&data ,sizeof(data),0xFFFF); //serial input, from coolterm
+		HAL_UART_Receive(&huart1, (uint8_t*)&data ,1,0xF); //serial input, from coolterm
 
-    	tft_prints(0, 0, "%s, %d, %d, %d", data, dropper1, dropper2, dropper3);
+    	tft_prints(0, 0, "%c, %d, %d, %d, %d", data[0], HAL_GetTick(), dropper1, dropper2, dropper3);
+    	tft_prints(0, 1, "spd: %d, %d, %d", motorSpeedLeft, motorSpeedRight, motorSpeedBack);
 		tft_update(0);
 
 		if (HAL_GetTick() - last_ticks >= 2000)
@@ -133,10 +134,10 @@ int main(void) {
 					motorSpeedLeft = 4000; motorSpeedRight = -4000; motorSpeedBack = 0;
 					break;
 				case '3': //left
-					motorSpeedLeft = -2000; motorSpeedRight = 2000; motorSpeedBack = -3000;
+					motorSpeedLeft = -2000; motorSpeedRight = -2000; motorSpeedBack = 4000;
 					break;
 				case '4': //right
-					motorSpeedLeft = 2000; motorSpeedRight = -2000; motorSpeedBack = 3000;
+					motorSpeedLeft = 2000; motorSpeedRight = 2000; motorSpeedBack = -4000;
 					break;
 				case '5': //rotate left
 					motorSpeedLeft = -2000; motorSpeedRight = -2000; motorSpeedBack = -2000;
@@ -145,58 +146,70 @@ int main(void) {
 					motorSpeedLeft = 2000; motorSpeedRight = 2000; motorSpeedBack = 2000;
 					break;
 				case '7': //Clamp and First Dropper Lock
-					if (dropper1 == 0)
+					if (HAL_GetTick() - last_ticks >= 1000)
 					{
-						dropper1 = 1;
-					}
-					else
-					{
-						dropper1 = 0;
+						if (dropper1 == 0)
+						{
+							dropper1 = 1;
+						}
+						else
+						{
+							dropper1 = 0;
+						}
+						last_ticks = HAL_GetTick() + 1000;
 					}
 					break;
 				case '8': //Lifter and Second Dropper Lock
-					if (dropper2 == 0)
+					if (HAL_GetTick() - last_ticks >= 1000)
 					{
-						dropper2 = 1;
-					}
-					else
-					{
-						dropper2 = 0;
+						if (dropper2 == 0)
+						{
+							dropper2 = 1;
+						}
+						else
+						{
+							dropper2 = 0;
+						}
+						last_ticks = HAL_GetTick() + 1000;
 					}
 					break;
 				case '9': // Third Dropper Lock
-					if (dropper3 == 0)
+					if (HAL_GetTick() - last_ticks >= 1000)
 					{
-						dropper3 = 1;
-					}
-					else
-					{
-						dropper3 = 0;
+						if (dropper3 == 0)
+						{
+							dropper3 = 1;
+						}
+						else
+						{
+							dropper3 = 0;
+						}
+						last_ticks = HAL_GetTick() + 1000;
 					}
 					break;
 			}
 
 			if (dropper1 == 0)
 			{
-				gpio_set(valve1);
+				gpio_reset(valve1);
 			}
 			else if (dropper1 == 1)
 			{
-				gpio_reset(valve1);
+				gpio_set(valve1);
 			}
 
 			if (dropper2 == 0)
 			{
-				gpio_set(valve2);
+				gpio_reset(valve2);
 			}
 			else if (dropper2 == 1)
 			{
-				gpio_reset(valve2);
+				gpio_set(valve2);
 			}
 
 			if (dropper3 == 0)
 			{
-				gpio_set(valve3);
+				gpio_reset(valve3);
 			}
 			else if (dropper3 == 1)
 			{
@@ -222,14 +235,14 @@ int main(void) {
 			switch(autoState)
 			{
 				case 1:	//Forward
-					motorSpeedLeft = -4000; motorSpeedRight = 4000; motorSpeedBack = 0;
+					motorSpeedLeft = 2000; motorSpeedRight = 0; motorSpeedBack = -2000; //(-2000,2000,0)
 					break;
 				case 0:	//Left
-					motorSpeedLeft = -2000; motorSpeedRight = 2000; motorSpeedBack = -3000;
+					motorSpeedLeft = 0; motorSpeedRight = -1000; motorSpeedBack = 1000;
 					break;
 			}
 		}
-		CAN_cmd_motor(motorSpeedLeft/2,motorSpeedRight/2,motorSpeedBack/2,0, &hcan1);
+		CAN_cmd_motor(motorSpeedLeft/2,motorSpeedRight,motorSpeedBack/2,0, &hcan1);
 		prevInput = data[0];
     }
     /* USER CODE END 3 */
